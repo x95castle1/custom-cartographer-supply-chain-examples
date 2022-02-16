@@ -32,13 +32,6 @@ spec:
       templateRef:
         kind: Runnable
         name: code-analysis
-      params:
-        - name: sonar-host-url
-          value: #@ data.values.image_prefix
-        - name: sonar-login
-          value: #@ data.values.image_prefix
-        - name: sonar-project-key
-          value: #@ data.values.image_prefix
       sources:
         - resource: source-provider
           name: source
