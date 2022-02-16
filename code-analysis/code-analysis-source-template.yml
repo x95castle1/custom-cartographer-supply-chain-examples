@@ -1,0 +1,32 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSourceTemplate
+metadata:
+  name: code-analysis-source
+spec:
+  urlPath: .status.outputs.url
+  revisionPath: .status.outputs.revision
+
+  template:
+    apiVersion: carto.run/v1alpha1
+    kind: Runnable
+    metadata:
+      name: $(workload.metadata.name)$
+    spec:
+
+      runTemplateRef:
+        name: tekton-sonar-taskrun
+
+      selector:
+        resource:
+          apiVersion: tekton.dev/v1beta1
+          kind: Task
+        matchingLabels:
+          task: code-analysis
+
+      inputs:
+        source: $(source)$
+        params:
+          - name: blob-url
+            value: $(source.url)$
+          - name: blob-revision
+            value: $(source.revision)$

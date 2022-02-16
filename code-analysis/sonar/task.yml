@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   labels:
-    apps.tanzu.vmware.com/task: test
+    task: code-analysis
   name: sonar
   namespace: default
 spec:

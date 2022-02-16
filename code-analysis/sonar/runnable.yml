@@ -1,8 +1,0 @@
-apiVersion: carto.run/v1alpha1
-kind: Runnable
-metadata:
-  name: code-analysis
-  namespace: default
-spec:
-  runTemplateRef:
-    name: tekton-sonar-taskrun
