@@ -29,8 +29,8 @@ spec:
 
     - name: code-analysis
       templateRef:
-        kind: Runnable
-        name: code-analysis
+        kind: ClusterSourceTemplate
+        name: code-analysis-source
       sources:
         - resource: source-provider
           name: source
