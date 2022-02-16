@@ -26,7 +26,7 @@ spec:
       inputs:
         source: $(source)$
         params:
-          - name: blob-url
+          - name: source-url
             value: $(source.url)$
-          - name: blob-revision
+          - name: source-revision
             value: $(source.revision)$
