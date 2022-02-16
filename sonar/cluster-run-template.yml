@@ -1,0 +1,25 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterRunTemplate
+metadata:
+  name: tekton-sonar-taskrun
+spec:
+  outputs:
+    url: spec.params[?(@.name=="source-url")].value
+  template:
+    apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: $(runnable.metadata.name)$-
+      labels: $(runnable.metadata.labels)$
+    spec:
+      params:
+      - name: source-url
+        value: $(runnable.spec.inputs.source-url)$
+      - name: sonar-host-url
+        value: $(runnable.spec.inputs.sonar-host-url)$
+      - name: sonar-login
+        value: $(runnable.spec.inputs.sonar-login)$
+      - name: sonar-project-key
+        value: $(runnable.spec.inputs.sonar-project-key)$
+      taskRef:
+        name: sonar

@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  labels:
+    apps.tanzu.vmware.com/task: test
+  name: sonar
+  namespace: default
+spec:
+  params:
+  - name: source-url
+    type: string
+  - name: sonar-project-key
+    type: string
+  - name: sonar-login
+    type: string
+  - name: sonar-host-url
+    type: string
+  steps:
+  - image: harbor-repo.vmware.com/dockerhub-proxy-cache/library/gradle
+    name: code-analysis
+    resources: {}
+    script: |-
+      cd `mktemp -d`
+
+      wget -qO- https://github.com/Mpluya/outer-loop/tarball/main | tar xvz
+      chmod +x mvnw
+      ./mvnw sonar:sonar -Dsonar.projectKey=$(params.sonar-project-key) -Dsonar.host.url=$(params.sonar-host-url) -Dsonar.login=$(params.sonar-host-url)
