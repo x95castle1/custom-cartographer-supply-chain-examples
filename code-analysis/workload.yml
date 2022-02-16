@@ -3,6 +3,8 @@ kind: Workload
 metadata:
   name: code-analysis
   namespace: default
+  labels:
+    workload-intent: code-analysis
 spec:
   source:
     git:

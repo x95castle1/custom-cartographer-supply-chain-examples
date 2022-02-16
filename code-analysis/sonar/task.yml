@@ -19,6 +19,5 @@ spec:
       cd `mktemp -d`
 
       wget -qO- $(params.source-url) | tar xvz
-      cd outer-loop-main
       chmod +x mvnw
       ./mvnw verify sonar:sonar -Dsonar.projectKey=$(params.sonar-project-key) -Dsonar.host.url=$(params.sonar-host-url) -Dsonar.login=$(params.sonar-login)

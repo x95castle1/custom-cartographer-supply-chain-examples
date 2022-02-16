@@ -20,8 +20,7 @@ metadata:
   name: code-analysis-supply-chain
 spec:
   selector:
-    app.tanzu.vmware.com/workload-type: web
-
+    workload-intent: code-analysis
   resources:
     - name: source-provider
       templateRef:
@@ -31,7 +30,7 @@ spec:
     - name: code-analysis
       templateRef:
         kind: Runnable
-        name: code-analysis
+        name: $(workload.metadata.name)$
       sources:
         - resource: source-provider
           name: source

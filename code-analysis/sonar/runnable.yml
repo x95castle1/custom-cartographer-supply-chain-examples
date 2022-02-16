@@ -1,7 +1,7 @@
 apiVersion: carto.run/v1alpha1
 kind: Runnable
 metadata:
-  name: code-analysis
+  name: $(workload.metadata.name)$
   namespace: default
 spec:
   runTemplateRef:
