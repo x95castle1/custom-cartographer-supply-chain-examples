@@ -8,9 +8,7 @@ metadata:
 spec:
   params:
   - name: source-url
-    value: $(params.source-url)
   - name: source-revision
-    value: $(params.source-revision)
   steps:
   - image: harbor-repo.vmware.com/dockerhub-proxy-cache/library/gradle
     name: code-analysis
