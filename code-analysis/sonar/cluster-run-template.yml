@@ -15,11 +15,7 @@ spec:
       params:
       - name: source-url
         value: $(runnable.spec.inputs.source-url)$
-      - name: sonar-host-url
-        value: $(runnable.spec.inputs.sonar-host-url)$
-      - name: sonar-login
-        value: $(runnable.spec.inputs.sonar-login)$
-      - name: sonar-project-key
-        value: $(runnable.spec.inputs.sonar-project-key)$
+      - name: source-revision
+        value: $(runnable.spec.inputs.source-revision)$
       taskRef:
         name: sonar

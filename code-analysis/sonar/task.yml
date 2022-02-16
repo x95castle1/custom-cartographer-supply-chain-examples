@@ -8,13 +8,9 @@ metadata:
 spec:
   params:
   - name: source-url
-    type: string
-  - name: sonar-project-key
-    type: string
-  - name: sonar-login
-    type: string
-  - name: sonar-host-url
-    type: string
+    value: $(params.source-url)
+  - name: source-revision
+    value: $(params.source-revision)
   steps:
   - image: harbor-repo.vmware.com/dockerhub-proxy-cache/library/gradle
     name: code-analysis
@@ -22,7 +18,7 @@ spec:
     script: |-
       cd `mktemp -d`
 
-      wget -qO- https://github.com/Mpluya/outer-loop/archive/main.tar.gz | tar xvz
+      wget -qO- $(params.source-url) | tar xvz
       cd outer-loop-main
       chmod +x mvnw
       ./mvnw verify sonar:sonar -Dsonar.projectKey=$(params.sonar-project-key) -Dsonar.host.url=$(params.sonar-host-url) -Dsonar.login=$(params.sonar-login)

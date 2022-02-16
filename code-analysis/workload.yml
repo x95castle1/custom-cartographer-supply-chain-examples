@@ -1,0 +1,11 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: code-analysis
+  namespace: default
+spec:
+  source:
+    git:
+      ref:
+        branch: main
+      url: https://github.com/Mpluya/outer-loop
