@@ -25,4 +25,4 @@ spec:
       wget -qO- https://github.com/Mpluya/outer-loop/archive/main.tar.gz | tar xvz
       cd outer-loop-main
       chmod +x mvnw
-      ./mvnw sonar:sonar -Dsonar.projectKey=$(params.sonar-project-key) -Dsonar.host.url=$(params.sonar-host-url) -Dsonar.login=$(params.sonar-login)
+      ./mvnw verify sonar:sonar -Dsonar.projectKey=$(params.sonar-project-key) -Dsonar.host.url=$(params.sonar-host-url) -Dsonar.login=$(params.sonar-login)
