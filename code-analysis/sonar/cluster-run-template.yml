@@ -15,8 +15,8 @@ spec:
     spec:
       params:
       - name: source-url
-        value: $(runnable.spec.inputs.source-url)$
+        value: $(source-url)$
       - name: source-revision
-        value: $(runnable.spec.inputs.source-revision)$
+        value: $(source-revision)$
       taskRef:
         name: sonar
