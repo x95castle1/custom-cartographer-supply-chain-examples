@@ -25,7 +25,7 @@ spec:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: source
+        name: unicorn-source
 
     - name: code-analysis
       templateRef:
@@ -33,4 +33,4 @@ spec:
         name: code-analysis-source
       sources:
         - resource: source-provider
-          name: source
+          name: unicorn-source
