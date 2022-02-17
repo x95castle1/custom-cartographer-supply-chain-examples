@@ -18,5 +18,4 @@ spec:
         value: $(runnable.spec.inputs.source-url)$
       - name: source-revision
         value: $(runnable.spec.inputs.source-revision)$
-      taskRef:
-        name: sonar
+      taskRef: {name: $(selected.metadata.name)$}
