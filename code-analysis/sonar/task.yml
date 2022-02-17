@@ -18,4 +18,4 @@ spec:
 
       wget -qO- $(params.source-url) | tar xvz
       chmod +x mvnw
-      ./mvnw verify sonar:sonar
+      ./mvnw verify sonar:sonar -Dsonar.qualitygate.wait=true
