@@ -24,5 +24,5 @@ spec:
           task: code-analysis
 
       inputs:
-        source-url: $(sources.source-provider.url)$
-        source-revision: $(sources.source-provider.revision)$
+        source-url: $(sources.source.url)$
+        source-revision: $(sources.source.revision)$
