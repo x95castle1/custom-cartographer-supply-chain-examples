@@ -1,7 +1,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterSourceTemplate
 metadata:
-  name: code-analysis-source
+  name: code-analysis
 spec:
   urlPath: .status.outputs.url
   revisionPath: .status.outputs.revision
@@ -24,5 +24,5 @@ spec:
           task: code-analysis
 
       inputs:
-        source-url: $(sources.unicorn-source.url)$
-        source-revision: $(sources.unicorn-source.revision)$
+        source-url: $(sources.source.url)$
+        source-revision: $(sources.source.revision)$

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#@ load("@ytt:data", "data")
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSupplyChain
@@ -25,12 +24,20 @@ spec:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: unicorn-source
+        name: source
 
-    - name: code-analysis
+    - name: code-analysis-source
       templateRef:
         kind: ClusterSourceTemplate
-        name: code-analysis-source
+        name: code-analysis
       sources:
         - resource: source-provider
-          name: unicorn-source
+          name: source
+
+    - name: image-builder
+      templateRef:
+        kind: ClusterImageTemplate
+        name: image
+      sources:
+        - resource: code-analysis-source
+          name: code-analysis

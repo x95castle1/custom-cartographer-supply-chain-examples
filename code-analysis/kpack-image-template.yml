@@ -1,0 +1,29 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterImageTemplate
+metadata:
+  name: image
+spec:
+  params:
+    - name: image_prefix
+      default: some-default-prefix-
+
+  imagePath: .status.latestImage
+
+  template:
+    apiVersion: kpack.io/v1alpha2
+    kind: Image
+    metadata:
+      name: $(workload.metadata.name)$
+    spec:
+      tag: $(params.image_prefix)$$(workload.metadata.name)$
+      serviceAccountName: #@ data.values.service_account_name
+      builder:
+        kind: ClusterBuilder
+        name: java-builder
+      source:
+        blob:
+          url: $(sources.source.url)$
+      build:
+        env: $(workload.spec.build.env)$

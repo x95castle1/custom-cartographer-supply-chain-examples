@@ -1,3 +1,5 @@
+#@ load("@ytt:data", "data")
+---
 apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
@@ -6,6 +8,7 @@ metadata:
   labels:
     workload-intent: code-analysis
 spec:
+  serviceAccountName: #@ data.values.service_account_name
   source:
     git:
       ref:
