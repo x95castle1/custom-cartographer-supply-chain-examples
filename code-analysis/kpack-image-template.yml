@@ -21,7 +21,7 @@ spec:
       serviceAccountName: #@ data.values.service_account_name
       builder:
         kind: ClusterBuilder
-        name: java-builder
+        name: default #tbs provided
       source:
         blob:
           url: $(sources.code-analysis.url)$
