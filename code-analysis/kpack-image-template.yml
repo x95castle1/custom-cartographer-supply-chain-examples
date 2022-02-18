@@ -4,6 +4,8 @@ apiVersion: carto.run/v1alpha1
 kind: ClusterImageTemplate
 metadata:
   name: image
+  annotations:
+    kapp.k14s.io/disable-original: ""
 spec:
   params:
     - name: image_prefix
