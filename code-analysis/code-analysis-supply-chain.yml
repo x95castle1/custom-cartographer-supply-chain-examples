@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
+#@ load("@ytt:data", "data")
+---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSupplyChain
 metadata:
@@ -32,3 +34,20 @@ spec:
       sources:
         - resource: source-provider
           name: source
+
+    - name: image-builder
+      params:
+      - name: serviceAccount
+        value: #@ data.values.service_account_name
+      - name: clusterBuilder
+        value: default
+      - name: registry
+        value:
+          repository: tapsme/supply-chain
+          server: harbor-repo.vmware.com
+      sources:
+      - name: source
+        resource: code-analysis
+      templateRef:
+        kind: ClusterImageTemplate
+        name: kpack-template
