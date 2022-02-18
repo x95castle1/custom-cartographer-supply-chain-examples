@@ -13,25 +13,7 @@
 # limitations under the License.
 
 #@ load("@ytt:data", "data")
----
-apiVersion: kpack.io/v1alpha2
-kind: ClusterStore
-metadata:
-  name: java-store
-spec:
-  sources:
-    - image: gcr.io/paketo-buildpacks/java
----
-apiVersion: kpack.io/v1alpha2
-kind: ClusterStack
-metadata:
-  name: stack
-spec:
-  id: "io.buildpacks.stacks.bionic"
-  buildImage:
-    image: "paketobuildpacks/build:base-cnb"
-  runImage:
-    image: "paketobuildpacks/run:base-cnb"
+
 ---
 apiVersion: kpack.io/v1alpha2
 kind: ClusterBuilder
@@ -43,10 +25,10 @@ spec:
     namespace: default
   tag: #@ data.values.image_prefix + "java-builder"
   stack:
-    name: stack
+    name: default #TBS provided
     kind: ClusterStack
   store:
-    name: java-store
+    name: default #TBS provided
     kind: ClusterStore
   order:
     - group:
