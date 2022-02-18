@@ -1,4 +1,4 @@
 #@data/values
 ---
 service_account_name: another
-image_prefix: "harbor-repo.vmware.com/tapsme/cartographer-"
+image_prefix: "tapsme/cartographer-"
