@@ -32,4 +32,4 @@ spec:
     kind: ClusterStore
   order:
     - group:
-        - id: paketo-buildpacks/java
+        - id: tanzu-buildpacks/java
