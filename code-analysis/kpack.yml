@@ -21,7 +21,6 @@ metadata:
 spec:
   sources:
     - image: gcr.io/paketo-buildpacks/java
-
 ---
 apiVersion: kpack.io/v1alpha2
 kind: ClusterStack
