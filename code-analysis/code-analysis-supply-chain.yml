@@ -46,8 +46,8 @@ spec:
           repository: tapsme/supply-chain
           server: harbor-repo.vmware.com
       sources:
-      - name: code-analysis-source
-        resource: source
+      - resource: code-analysis-source
+        name: source
       templateRef:
         kind: ClusterImageTemplate
         name: kpack-template
