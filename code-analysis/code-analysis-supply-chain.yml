@@ -25,15 +25,15 @@ spec:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: source
+        name: git-source
 
     - name: code-analysis-source
       templateRef:
         kind: ClusterSourceTemplate
-        name: code-analysis
+        name: source
       sources:
         - resource: source-provider
-          name: source
+          name: git-source
 
     - name: image-builder
       params:
@@ -47,7 +47,7 @@ spec:
           server: harbor-repo.vmware.com
       sources:
       - name: code-analysis-source
-        resource: code-analysis
+        resource: source
       templateRef:
         kind: ClusterImageTemplate
         name: kpack-template

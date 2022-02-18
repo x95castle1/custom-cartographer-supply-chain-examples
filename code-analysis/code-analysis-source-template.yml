@@ -3,7 +3,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterSourceTemplate
 metadata:
-  name: code-analysis
+  name: source
 spec:
   urlPath: .status.outputs.url
   revisionPath: .status.outputs.revision
