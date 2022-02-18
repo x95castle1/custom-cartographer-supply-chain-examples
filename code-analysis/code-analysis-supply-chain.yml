@@ -46,7 +46,7 @@ spec:
           repository: tapsme/supply-chain
           server: harbor-repo.vmware.com
       sources:
-      - name: source
+      - name: code-analysis-source
         resource: code-analysis
       templateRef:
         kind: ClusterImageTemplate
