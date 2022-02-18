@@ -26,5 +26,5 @@ spec:
           task: code-analysis
 
       inputs:
-        source-url: $(sources.source.url)$
-        source-revision: $(sources.source.revision)$
+        source-url: $(sources.git-source.url)$
+        source-revision: $(sources.git-source.revision)$
