@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-#@ load("@ytt:data", "data")
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSupplyChain
@@ -34,14 +32,3 @@ spec:
       sources:
         - resource: source-provider
           name: source
-
-    - name: image-builder
-      templateRef:
-        kind: ClusterImageTemplate
-        name: image
-      params:
-        - name: image_prefix
-          value: #@ data.values.image_prefix
-      sources:
-        - resource: code-analysis-source
-          name: code-analysis
