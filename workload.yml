@@ -13,4 +13,4 @@ spec:
     git:
       ref:
         branch: main
-      url: https://github.com/Mpluya/outer-loop
+      url: https://github.com/Mpluya/code-analysis

@@ -9,18 +9,18 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     metadata:
-      name: $(workload.name)$
+      name: $(workload.metadata.name)$
     spec:
       serviceAccountName: #@ data.values.service_account_name
       selector:
         matchLabels:
-          app: $(workload.name)$
+          app: $(workload.metadata.name)$
       template:
         metadata:
           labels:
-            app: $(workload.name)$
+            app: $(workload.metadata.name)$
         spec:
           containers:
             - name: main
-              image: $(images[0].image)$     # consume the image that we depend
+              image: $(images.image.image)$     # consume the image that we depend
                                              #            on from `kpack/Image`
