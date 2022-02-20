@@ -1,0 +1,8 @@
+---
+apiVersion: kpack.io/v1alpha2
+kind: ClusterStore
+metadata:
+  name: java-store
+spec:
+  sources:
+    - image: gcr.io/paketo-buildpacks/java

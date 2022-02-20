@@ -1,0 +1,26 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: app-deploy
+spec:
+  template:
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: $(workload.name)$
+    spec:
+      serviceAccountName: #@ data.values.service_account_name
+      selector:
+        matchLabels:
+          app: $(workload.name)$
+      template:
+        metadata:
+          labels:
+            app: $(workload.name)$
+        spec:
+          containers:
+            - name: main
+              image: $(images[0].image)$     # consume the image that we depend
+                                             #            on from `kpack/Image`
