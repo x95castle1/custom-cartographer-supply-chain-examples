@@ -48,10 +48,18 @@ spec:
     
     - name: deployer
       templateRef:
-        kind: ClusterConfigTemplate
+        kind: ClusterTemplate
         name: app-deploy
       images:
         - resource: image-builder
+          name: image
+
+    - name: config-provider
+      templateRef:
+        kind: ClusterConfigTemplate
+        name: app-config
+      images:
+        - resource: image-builder # TODO: see how this can be dependent on a successful app-deploy
           name: image
 
     - name: git-writer
@@ -59,5 +67,5 @@ spec:
         kind: ClusterTemplate
         name: git-writer
       configs:
-        - resource: deployer
-          name: app-deploy
+        - resource: config-provider
+          name: app-config

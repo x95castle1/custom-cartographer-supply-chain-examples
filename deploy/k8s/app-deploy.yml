@@ -1,35 +1,26 @@
 #@ load("@ytt:data", "data")
 ---
 apiVersion: carto.run/v1alpha1
-kind: ClusterConfigTemplate
+kind: ClusterTemplate
 metadata:
   name: app-deploy
 spec:
-  configPath: .data.manifest
-
-  ytt: |
-    #@ load("@ytt:data", "data")
-    apiVersion: v1
-    kind: ConfigMap
+  template:
+    apiVersion: apps/v1
+    kind: Deployment
     metadata:
-      name: #@ data.values.workload.metadata.name
-    data:
-      #@yaml/text-templated-strings
-      manifest: |
-        apiVersion: apps/v1
-        kind: Deployment
+      name: $(workload.metadata.name)$
+    spec:
+      serviceAccountName: #@ data.values.service_account_name
+      selector:
+        matchLabels:
+          app: $(workload.metadata.name)$
+      template:
         metadata:
-          name: #@ workload.metadata.name
+          labels:
+            app: $(workload.metadata.name)$
         spec:
-          serviceAccountName: #@ data.values.service_account_name
-          selector:
-            matchLabels:
-              app: #@ workload.metadata.name
-          template:
-            metadata:
-              labels:
-                app: #@ workload.metadata.name
-            spec:
-              containers:
-                - name: main
-                  image: $(images.image.image)$ 
+          containers:
+            - name: main
+              image: $(images.image.image)$     # consume the image that we depend
+                                             #            on from `kpack/Image`
