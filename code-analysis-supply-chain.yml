@@ -48,8 +48,16 @@ spec:
     
     - name: deployer
       templateRef:
-        kind: ClusterTemplate
+        kind: ClusterConfigTemplate
         name: app-deploy
       images:
         - resource: image-builder
           name: image
+
+    - name: git-writer
+      templateRef:
+        kind: ClusterTemplate
+        name: git-writer
+      configs:
+        - resource: deployer
+          name: app-deploy
