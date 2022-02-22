@@ -1,0 +1,20 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterDelivery
+metadata:
+  name: deliver
+spec:
+  selector:
+    app.tanzu.vmware.com/workload-type: deliver
+
+  resources:
+    - name: source-provider
+      templateRef:
+        kind: ClusterSourceTemplate
+        name: gitops-source
+
+    - name: deployer
+      templateRef:
+        kind: ClusterDeploymentTemplate
+        name: app-deploy
+      deployment:
+        resource: source-provider

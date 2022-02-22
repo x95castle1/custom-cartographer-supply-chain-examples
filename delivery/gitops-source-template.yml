@@ -1,0 +1,19 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSourceTemplate
+metadata:
+  name: gitops-source
+spec:
+  urlPath: .status.artifact.url
+  revisionPath: .status.artifact.revision
+
+  template:
+    apiVersion: source.toolkit.fluxcd.io/v1beta1
+    kind: GitRepository
+    metadata:
+      name: $(deliverable.metadata.name)$
+    spec:
+      interval: 1m0s
+      url: $(deliverable.spec.source.git.url)$
+      ref: $(deliverable.spec.source.git.ref)$
+      secretRef:
+        name: gitops-ssh-secret
