@@ -59,7 +59,7 @@ kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektonc
 ## Run the example in this repo 
 > assumes current working directory is repo root
 
-Deploy workload to run through supply chain:
+Deploy workload to run through supply chain with the following steps: **get source** &rarr; **run test and sonar code quality analysis** &rarr; **image build** &rarr; **deploy** &rarr; **write config**
 ```
 kapp deploy --yes -a demo \
 -f <(ytt --ignore-unknown-comments -f .) \
@@ -68,7 +68,7 @@ kapp deploy --yes -a demo \
 -f <(ytt --ignore-unknown-comments -f ./deploy/k8s -f values.yml) \
 -f ./source
 ```
-Deploy deliverable through cluster delivery:
+Deploy deliverable through cluster delivery with the following steps: **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy**
 ```
 kapp deploy --yes -a sonarfundelivery \
 -f <(ytt --ignore-unknown-comments -f ./delivery.yml -f values.yml) \
