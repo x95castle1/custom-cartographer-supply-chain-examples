@@ -1,4 +1,3 @@
-#@ load("@ytt:data", "data")
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterDeploymentTemplate

@@ -1,0 +1,24 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterDelivery
+metadata:
+  name: deliver
+spec:
+  selector:
+    app.tanzu.vmware.com/workload-type: deliver
+
+  resources:
+    - name: source-provider
+      templateRef:
+        kind: ClusterSourceTemplate
+        name: gitops-source
+
+    - name: deployer
+      templateRef:
+        kind: ClusterDeploymentTemplate
+        name: app-deploy
+      # in a supply chain, the output of a source template is only available as a `source`
+      # in a delivery, a source template's output can be consumed as a `deployment`
+      # every ClusterDeploymentTemplate must be passed exactly one deployment. the deployment
+      # is not named (as other inputs can be)
+      deployment:
+        resource: source-provider
