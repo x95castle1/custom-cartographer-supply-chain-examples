@@ -32,7 +32,7 @@ spec:
     metadata:
       name: $(workload.metadata.name)$-git-writer
     spec:
-      serviceAccountName: #@ data.values.service_account_name
+      serviceAccountName: $(workload.spec.serviceAccountName)$
       runTemplateRef:
         name: git-writer
 

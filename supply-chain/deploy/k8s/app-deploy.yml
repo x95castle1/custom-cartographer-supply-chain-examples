@@ -1,4 +1,4 @@
-#@ load("@ytt:data", "data")
+
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterTemplate
@@ -11,7 +11,7 @@ spec:
     metadata:
       name: $(workload.metadata.name)$
     spec:
-      serviceAccountName: #@ data.values.service_account_name
+      serviceAccountName: $(workload.spec.serviceAccountName)$
       selector:
         matchLabels:
           app: $(workload.metadata.name)$

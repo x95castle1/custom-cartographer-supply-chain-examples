@@ -1,4 +1,3 @@
-#@ load("@ytt:data", "data")
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSourceTemplate
@@ -14,7 +13,7 @@ spec:
     metadata:
       name: $(workload.metadata.name)$
     spec:
-      serviceAccountName: #@ data.values.service_account_name
+      serviceAccountName: $(workload.spec.serviceAccountName)$
       runTemplateRef:
         name: tekton-sonar-taskrun
 

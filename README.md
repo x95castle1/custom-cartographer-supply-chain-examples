@@ -57,23 +57,22 @@ kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektonc
 ```
 
 ## Run the example in this repo 
-> assumes current working directory is repo root
+
+> assumes current working directory is `repo root/supply-chain`
 
 Deploy workload to run through supply chain with the following steps: <span style="color: green;"> **get source** &rarr; **run test and sonar code quality analysis** &rarr; **image build** &rarr; **deploy** &rarr; **write config** </span>
 ```
-kapp deploy --yes -a demo \
--f <(ytt --ignore-unknown-comments -f .) \
--f <(ytt --ignore-unknown-comments -f ./build/kpack -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./code-analysis/sonar -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./deploy/k8s -f values.yml) \
--f ./source
+kapp deploy --yes -a demo -f <(ytt --ignore-unknown-comments -f . -f ../values.yml) \
+-f <(ytt --ignore-unknown-comments -f ../shared -f ../values.yml)
 ```
+
+
+
+> assumes current working directory is `repo root/delivery`
+
 Deploy deliverable through cluster delivery with the following steps: <span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
 ```
-kapp deploy --yes -a sonarfundelivery \
--f <(ytt --ignore-unknown-comments -f ./delivery.yml -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./service-account.yml -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./secret.yml -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./delivery -f values.yml)
+kapp deploy --yes -a demodelivery -f <(ytt --ignore-unknown-comments -f . -f ../values.yml) \
+-f <(ytt --ignore-unknown-comments -f ../shared -f ../values.yml)
 ```
 

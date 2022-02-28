@@ -1,4 +1,3 @@
-#@ load("@ytt:data", "data")
 ---
 apiVersion: carto.run/v1alpha1
 kind: ClusterImageTemplate
@@ -18,7 +17,7 @@ spec:
       name: $(workload.metadata.name)$
     spec:
       tag: $(params.image_prefix)$$(workload.metadata.name)$
-      serviceAccountName: #@ data.values.service_account_name
+      serviceAccountName: $(workload.spec.serviceAccountName)$
       builder:
         kind: ClusterBuilder
         name: java-builder
