@@ -1,0 +1,38 @@
+#@ load("@ytt:data", "data")
+
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: deliverable-template
+spec:
+  params:
+    - name: git_server
+      default: #@ data.values.git_writer.server
+    - name: git_repository
+      default: #@ data.values.git_writer.repository
+    - name: git_branch
+      default: #@ data.values.git_writer.branch
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+
+    #@ def giturl():
+    #@   return "ssh://git@" + "/".join([
+    #@    data.values.params.git_server,
+    #@    data.values.params.git_repository
+    #@    ])
+    #@ end
+    
+    apiVersion: carto.run/v1alpha1
+    kind: Deliverable
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      labels:
+        app.tanzu.vmware.com/workload-type: deliver
+    spec:
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+      source:
+        git:
+          url: #@ giturl()
+          ref:
+            branch: #@ data.values.params.git_branch

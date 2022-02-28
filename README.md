@@ -72,7 +72,6 @@ kapp deploy --yes -a demo -f <(ytt --ignore-unknown-comments -f . -f ../values.y
 
 Deploy deliverable through cluster delivery with the following steps: <span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
 ```
-kapp deploy --yes -a demodelivery -f <(ytt --ignore-unknown-comments -f . -f ../values.yml) \
--f <(ytt --ignore-unknown-comments -f ../shared -f ../values.yml)
+kapp deploy --yes -a demodelivery -f <(ytt --ignore-unknown-comments -f . -f ../values.yml)
 ```
 

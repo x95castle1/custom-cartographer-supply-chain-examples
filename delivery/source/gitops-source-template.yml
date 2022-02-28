@@ -10,7 +10,7 @@ spec:
     apiVersion: source.toolkit.fluxcd.io/v1beta1
     kind: GitRepository
     metadata:
-      name: $(deliverable.metadata.name)$
+      name: $(deliverable.metadata.name)$-app
     spec:
       interval: 1m0s
       url: $(deliverable.spec.source.git.url)$

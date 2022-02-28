@@ -13,4 +13,5 @@ spec:
     git:
       ref:
         branch: main
-      url: https://github.com/Mpluya/code-analysis
+      url: ssh://git@github.com/Mpluya/code-analysis
+          
