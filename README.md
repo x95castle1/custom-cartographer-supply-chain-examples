@@ -66,7 +66,6 @@ Deploy deliverable through cluster delivery with the following steps: <span styl
 kapp deploy --yes -a demo \
 -f <(ytt --ignore-unknown-comments -f workload.yml -f values.yml) \
 -f <(ytt --ignore-unknown-comments -f ./shared -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./delivery -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./supply-chain -f values.yml) 
+-f <(ytt --ignore-unknown-comments -f ./code-analysis -f values.yml)
 ```
 
