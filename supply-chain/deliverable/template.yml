@@ -7,11 +7,11 @@ metadata:
 spec:
   params:
     - name: git_server
-      default: #@ data.values.git_writer.server
+      default: ""
     - name: git_repository
-      default: #@ data.values.git_writer.repository
+      default: ""
     - name: git_branch
-      default: #@ data.values.git_writer.branch
+      default: ""
 
   ytt: |
     #@ load("@ytt:data", "data")

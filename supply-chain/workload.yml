@@ -9,6 +9,13 @@ metadata:
     workload-intent: code-analysis
 spec:
   serviceAccountName: #@ data.values.service_account_name
+  params:
+    - name: git_server
+      value: github.com
+    - name: git_repository
+      value: Mpluya/code-analysis-config
+    - name: git_branch
+      value: main 
   source:
     git:
       ref:
