@@ -1,0 +1,21 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: delete-deploy-runnable-template
+spec:
+  template:
+    apiVersion: carto.run/v1alpha1
+    kind: Runnable
+    metadata:
+      name: delete-deploy-$(workload.metadata.name)$
+    spec:
+      serviceAccountName: $(workload.spec.serviceAccountName)$
+      runTemplateRef:
+        name: delete-deploy-taskrun
+
+      selector:
+        resource:
+          apiVersion: tekton.dev/v1beta1
+          kind: Task
+        matchingLabels:
+          task: delete-deploy

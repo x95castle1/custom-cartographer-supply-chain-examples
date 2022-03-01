@@ -74,3 +74,8 @@ spec:
       templateRef:
         kind: ClusterTemplate
         name: deliverable-template
+
+    - name: delete-deploy
+      templateRef:
+        kind: ClusterRunTemplate
+        name: deliverable-template
