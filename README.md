@@ -64,6 +64,7 @@ Deploy workload to run through supply chain with the following steps: <span styl
 Deploy deliverable through cluster delivery with the following steps: <span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
 ```
 kapp deploy --yes -a demo \
+-f <(ytt --ignore-unknown-comments -f workload.yml -f values.yml) \
 -f <(ytt --ignore-unknown-comments -f ./shared -f values.yml) \
 -f <(ytt --ignore-unknown-comments -f ./delivery -f values.yml) \
 -f <(ytt --ignore-unknown-comments -f ./supply-chain -f values.yml) 
