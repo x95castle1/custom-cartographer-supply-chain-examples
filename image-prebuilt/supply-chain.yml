@@ -37,3 +37,8 @@ spec:
       configs:
         - resource: config-provider 
           name: app-config
+
+    - name: deliverable
+      templateRef:
+        kind: ClusterTemplate
+        name: deliverable-template

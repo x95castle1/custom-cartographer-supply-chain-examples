@@ -1,0 +1,35 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterConfigTemplate
+metadata:
+  name: app-config
+spec:
+  configPath: .data.manifest
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: #@ data.values.workload.metadata.name
+    data:
+      #@yaml/text-templated-strings
+      manifest: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: (@= data.values.workload.metadata.name @)
+        spec:
+          serviceAccountName: (@= data.values.workload.spec.serviceAccountName @)
+          selector:
+            matchLabels:
+              app: (@= data.values.workload.metadata.name @)
+          template:
+            metadata:
+              labels:
+                app: (@= data.values.workload.metadata.name @)
+            spec:
+              containers:
+                - name: main
+                  image: (@= data.values.image @)
