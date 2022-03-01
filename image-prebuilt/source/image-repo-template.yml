@@ -1,0 +1,16 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterImageTemplate
+metadata:
+  name: image-source
+spec:
+  imagePath: .spec.image
+
+  template:
+    apiVersion: source.apps.tanzu.vmware.com/v1alpha1
+    kind: ImageRepository
+    metadata:
+      name: $(workload.metadata.name)$
+    spec:
+      serviceAccount: $(workload.spec.serviceAccountName)$
+      interval: 1m0s
+      image: $(workload.spec.source.image)$

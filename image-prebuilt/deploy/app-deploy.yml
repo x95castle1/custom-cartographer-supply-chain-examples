@@ -1,0 +1,26 @@
+
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: app-deploy
+spec:
+  template:
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: $(workload.metadata.name)$
+    spec:
+      serviceAccountName: $(workload.spec.serviceAccountName)$
+      selector:
+        matchLabels:
+          app: $(workload.metadata.name)$
+      template:
+        metadata:
+          labels:
+            app: $(workload.metadata.name)$
+        spec:
+          containers:
+            - name: main
+              image: $(images.image.image)$     # consume the image that we depend
+                                             #            on from `kpack/Image`

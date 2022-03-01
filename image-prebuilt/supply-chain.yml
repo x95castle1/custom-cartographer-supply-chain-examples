@@ -1,0 +1,39 @@
+---
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterSupplyChain
+metadata:
+  name: image-prebuilt-supply-chain
+spec:
+  selector:
+    workload-intent: image-prebuilt
+  resources:
+    - name: image-provider
+      templateRef:
+        kind: ClusterImageTemplate
+        name: image-source
+
+    - name: deployer
+      templateRef:
+        kind: ClusterTemplate
+        name: app-deploy
+      images:
+        - resource: image-provider
+          name: image
+
+    - name: config-provider
+      templateRef:
+        kind: ClusterConfigTemplate
+        name: app-config
+      images:
+        - resource: image-provider
+          name: image
+
+    # will write config from app-config as json to be pushed by imgpkg
+    - name: image-writer
+      templateRef:
+        kind: ClusterTemplate
+        name: image-writer
+      configs:
+        - resource: config-provider 
+          name: app-config
