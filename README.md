@@ -46,7 +46,8 @@ supplychain, forms something powerful.
 6. Install [tekton]
 
 ```bash
-TEKTON_VERSION=0.30.0 kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/previous/v$TEKTON_VERSION/release.yaml
+export TEKTON_VERSION=0.30.0 
+kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/previous/v$TEKTON_VERSION/release.yaml
 ```
 
 7. Install the [git-cli task](https://github.com/tektoncd/catalog/tree/main/task/git-cli/0.2) from the
