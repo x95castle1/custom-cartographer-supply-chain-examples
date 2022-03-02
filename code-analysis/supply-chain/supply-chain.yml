@@ -46,13 +46,13 @@ spec:
         - resource: code-analysis-source
           name: source
     
-    # - name: deployer
-    #   templateRef:
-    #     kind: ClusterTemplate
-    #     name: app-deploy
-    #   images:
-    #     - resource: image-builder
-    #       name: image
+    - name: deployer
+      templateRef:
+        kind: ClusterTemplate
+        name: app-deploy
+      images:
+        - resource: image-builder
+          name: image
 
     - name: config-provider
       templateRef:
