@@ -64,7 +64,7 @@ spec:
 
     - name: git-writer
       templateRef:
-        kind: ClusterTemplate
+        kind: ClusterSourceTemplate
         name: git-writer
       configs:
         - resource: config-provider
@@ -74,3 +74,6 @@ spec:
       templateRef:
         kind: ClusterTemplate
         name: deliverable-template
+      sources:
+        - resource: git-writer
+          name: gitops-source
