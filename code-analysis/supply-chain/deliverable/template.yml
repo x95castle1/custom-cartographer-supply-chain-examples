@@ -11,7 +11,7 @@ spec:
     - name: git_repository
       default: ""
     - name: git_branch
-      default: ""
+      default: "main"
 
   ytt: |
     #@ load("@ytt:data", "data")

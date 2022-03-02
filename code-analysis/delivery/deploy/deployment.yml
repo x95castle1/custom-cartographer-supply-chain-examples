@@ -4,7 +4,6 @@ kind: ClusterDeploymentTemplate
 metadata:
   name: app-deploy
 spec:
-
   observedCompletion:
     succeeded:
       key: '.status.conditions[?(@.type=="ReconcileSucceeded")].status'

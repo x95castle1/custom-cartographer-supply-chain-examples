@@ -56,22 +56,18 @@ TEKTON_VERSION=0.30.0 kubectl apply -f https://storage.googleapis.com/tekton-rel
 kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-cli/0.2/git-cli.yaml
 ```
 
+8. Install [sonarqube](https://docs.sonarqube.org/latest/setup/sonarqube-on-kubernetes/) (skip if you already have a sonarqube instance running in a cluster)
+
 ## Run the example in this repo 
 
-> assumes current working directory is `repo root/supply-chain`
+> assumes current working directory is `repo root`
 
-Deploy workload to run through supply chain with the following steps: <span style="color: green;"> **get source** &rarr; **run test and sonar code quality analysis** &rarr; **image build** &rarr; **deploy** &rarr; **write config** </span>
-```
-kapp deploy --yes -a demo -f <(ytt --ignore-unknown-comments -f . -f ../values.yml) \
--f <(ytt --ignore-unknown-comments -f ../shared -f ../values.yml)
-```
-
-
-
-> assumes current working directory is `repo root/delivery`
-
+Deploy workload to run through supply chain with the following steps: <span style="color: green;"> **get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config** </span> AND
 Deploy deliverable through cluster delivery with the following steps: <span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
 ```
-kapp deploy --yes -a demodelivery -f <(ytt --ignore-unknown-comments -f . -f ../values.yml)
+kapp deploy --yes -a demo -c \
+-f <(ytt --ignore-unknown-comments -f workload.yml -f values.yml) \
+-f <(ytt --ignore-unknown-comments -f ./shared -f values.yml) \
+-f <(ytt --ignore-unknown-comments -f ./code-analysis -f values.yml)
 ```
 

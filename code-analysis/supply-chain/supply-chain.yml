@@ -46,20 +46,20 @@ spec:
         - resource: code-analysis-source
           name: source
     
-    # - name: deployer
-    #   templateRef:
-    #     kind: ClusterTemplate
-    #     name: app-deploy
-    #   images:
-    #     - resource: image-builder
-    #       name: image
+    - name: deployer
+      templateRef:
+        kind: ClusterTemplate
+        name: app-deploy
+      images:
+        - resource: image-builder
+          name: image
 
     - name: config-provider
       templateRef:
         kind: ClusterConfigTemplate
         name: app-config
       images:
-        - resource: image-builder # TODO: see how this can be dependent on a successful app-deploy
+        - resource: image-builder
           name: image
 
     - name: git-writer
