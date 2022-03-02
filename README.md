@@ -56,6 +56,8 @@ TEKTON_VERSION=0.30.0 kubectl apply -f https://storage.googleapis.com/tekton-rel
 kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-cli/0.2/git-cli.yaml
 ```
 
+8. Install [sonarqube](https://docs.sonarqube.org/latest/setup/sonarqube-on-kubernetes/) (skip if you already have a sonarqube instance running in a cluster)
+
 ## Run the example in this repo 
 
 > assumes current working directory is `repo root`
