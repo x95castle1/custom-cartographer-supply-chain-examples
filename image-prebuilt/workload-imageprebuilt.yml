@@ -3,20 +3,16 @@
 apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
-  name: code-analysis
+  name: image-prebuilt
   namespace: default
   labels:
-    workload-intent: code-analysis
+    workload-intent: image-prebuilt
 spec:
   serviceAccountName: #@ data.values.service_account_name
   params:
     - name: registry_server
-      value: github.com
+      value: harbor-repo.vmware.com
     - name: registry_repository
-      value: Mpluya/code-analysis-config
+      value: tapsme/cartographer
   source:
-    git:
-      ref:
-        branch: main
-      url: ssh://git@github.com/Mpluya/code-analysis
-          
+    image: harbor-repo.vmware.com/tapsme/special-spring-boot-app:0.0.1

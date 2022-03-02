@@ -18,8 +18,8 @@ spec:
 
     #@ def image():
     #@   return "/".join([
-    #@    data.values.params.registry.server,
-    #@    data.values.params.registry.repository,
+    #@    data.values.params.registry_server,
+    #@    data.values.params.registry_repository,
     #@    "-".join([
     #@      data.values.workload.metadata.name,
     #@      data.values.workload.metadata.namespace,
