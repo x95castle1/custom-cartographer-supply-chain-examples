@@ -59,7 +59,7 @@ spec:
         kind: ClusterConfigTemplate
         name: app-config
       images:
-        - resource: image-builder # TODO: see how this can be dependent on a successful app-deploy
+        - resource: image-builder
           name: image
 
     - name: git-writer
