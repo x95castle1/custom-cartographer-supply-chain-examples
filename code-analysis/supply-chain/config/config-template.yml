@@ -19,6 +19,9 @@ spec:
         apiVersion: apps/v1
         kind: Deployment
         metadata:
+          annotations: 
+            kapp.k14s.io/disable-default-label-scoping-rules: ''
+            kapp.k14s.io/disable-default-ownership-label-rules: ''
           name: (@= data.values.workload.metadata.name @)
         spec:
           serviceAccountName: (@= data.values.workload.spec.serviceAccountName @)
