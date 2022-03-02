@@ -63,8 +63,13 @@ kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektonc
 
 > assumes current working directory is `repo root`
 
-Deploy workload to run through supply chain with the following steps: <span style="color: green;"> **get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config** </span> AND
-Deploy deliverable through cluster delivery with the following steps: <span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
+Deploy workload to run through supply chain with the following steps: 
+
+<span style="color: green;"> **get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config** </span> 
+
+AND Deploy deliverable through cluster delivery with the following steps: 
+
+<span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
 ```
 kapp deploy --yes -a demo -c \
 -f <(ytt --ignore-unknown-comments -f workload.yml -f values.yml) \
