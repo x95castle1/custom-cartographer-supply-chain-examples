@@ -6,11 +6,11 @@ metadata:
   name: deliverable-template
 spec:
   params:
-    - name: git_server
+    - name: gitops_server
       default: ""
-    - name: git_repository
+    - name: gitops_repository
       default: ""
-    - name: git_branch
+    - name: gitops_branch
       default: "main"
 
   ytt: |
@@ -18,8 +18,8 @@ spec:
 
     #@ def giturl():
     #@   return "ssh://git@" + "/".join([
-    #@    data.values.params.git_server,
-    #@    data.values.params.git_repository
+    #@    data.values.params.gitops_server,
+    #@    data.values.params.gitops_repository
     #@    ])
     #@ end
     
@@ -35,5 +35,5 @@ spec:
         git:
           url: #@ giturl()
           ref:
-            branch: #@ data.values.params.git_branch
+            branch: #@ data.values.params.gitops_branch
             commit: #@ data.values.source.revision

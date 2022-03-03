@@ -2,7 +2,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterSourceTemplate
 metadata:
-  name: source
+  name: tested-source
 spec:
   urlPath: .status.outputs.url
   revisionPath: .status.outputs.revision
@@ -25,5 +25,5 @@ spec:
           task: code-analysis
 
       inputs:
-        source-url: $(sources.git-source.url)$
-        source-revision: $(sources.git-source.revision)$
+        source-url: $(sources.source.url)$
+        source-revision: $(sources.source.revision)$

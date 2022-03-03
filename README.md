@@ -26,6 +26,8 @@ This means that `cartographer` by itself is not very useful - its powers arise
 from integrating other Kubernetes resources that when tied together with a
 supplychain, forms something powerful.
 
+Install the following utilities as well as Cartographer!
+
 - [kpack](https://github.com/pivotal/kpack/blob/main/docs/install.md),
   for providing an opinionated way of continuously building container
   images using buildpacks
@@ -63,8 +65,13 @@ kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektonc
 
 > assumes current working directory is `repo root`
 
-Deploy workload to run through supply chain with the following steps: <span style="color: green;"> **get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config** </span> AND
-Deploy deliverable through cluster delivery with the following steps: <span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
+Submit a workload to run through a supply chain with the following steps: 
+
+<span>**get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config**  &rarr; **stamp out a deliverable** </span> and 
+
+Deploy the deliverable produced from the supply chain through cluster delivery with the following steps: 
+
+<span> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
 ```
 kapp deploy --yes -a demo -c \
 -f <(ytt --ignore-unknown-comments -f workload.yml -f values.yml) \
