@@ -5,7 +5,7 @@ kind: ClusterSourceTemplate
 metadata:
   name: git-writer-source
 spec:
-  urlPath: .status.outputs.revision
+  urlPath: .status.outputs.revision # this is unused, yet needs to be valued to be deemed a valid ClusterSourceTemplate output
   revisionPath: .status.outputs.revision
   params:
     - name: git_writer_username
