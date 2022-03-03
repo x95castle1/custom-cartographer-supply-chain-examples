@@ -67,13 +67,11 @@ kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektonc
 
 Submit a workload to run through a supply chain with the following steps: 
 
-<span style="color: green;"> **get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config**  &rarr; **stamp out a deliverable** </span> 
-
-and 
+<span>**get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config**  &rarr; **stamp out a deliverable** </span> and 
 
 Deploy the deliverable produced from the supply chain through cluster delivery with the following steps: 
 
-<span style="color: green;"> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
+<span> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
 ```
 kapp deploy --yes -a demo -c \
 -f <(ytt --ignore-unknown-comments -f workload.yml -f values.yml) \
