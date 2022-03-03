@@ -1,11 +1,11 @@
 ---
-
 apiVersion: carto.run/v1alpha1
 kind: ClusterRunTemplate
 metadata:
   name: git-writer
 spec:
   outputs:
+    url: '.status.taskResults[?(@.name=="commit")].value'
     revision: '.status.taskResults[?(@.name=="commit")].value'
   template:
     apiVersion: tekton.dev/v1beta1

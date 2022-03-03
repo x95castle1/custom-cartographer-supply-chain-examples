@@ -3,9 +3,9 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterSourceTemplate
 metadata:
-  name: git-writer
+  name: git-writer-source
 spec:
-  urlPath: ''
+  urlPath: .status.outputs.revision
   revisionPath: .status.outputs.revision
   params:
     - name: git_writer_username

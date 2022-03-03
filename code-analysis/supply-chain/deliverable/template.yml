@@ -36,4 +36,4 @@ spec:
           url: #@ giturl()
           ref:
             branch: #@ data.values.params.git_branch
-            commit: #@ data.values.sources.gitops-source.revision
+            commit: #@ data.values.source.revision
