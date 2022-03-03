@@ -64,8 +64,8 @@ spec:
 
     - name: git-writer
       templateRef:
-        kind: ClusterTemplate
-        name: git-writer
+        kind: ClusterSourceTemplate 
+        name: git-writer-source # returns the commit sha of what was pushed to git
       configs:
         - resource: config-provider
           name: app-config
@@ -74,3 +74,6 @@ spec:
       templateRef:
         kind: ClusterTemplate
         name: deliverable-template
+      sources:
+        - resource: git-writer
+          name: git-writer-source # commit sha of what git-writter wrote is included in the deliverable
