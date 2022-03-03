@@ -25,15 +25,15 @@ spec:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: git-source
+        name: source
 
-    - name: code-analysis-source
+    - name: source-tester-analyzer
       templateRef:
         kind: ClusterSourceTemplate
-        name: source
+        name: tested-source
       sources:
         - resource: source-provider
-          name: git-source
+          name: source
 
     - name: image-builder
       templateRef:
@@ -43,8 +43,8 @@ spec:
         - name: image_prefix
           value: #@ data.values.image_prefix
       sources:
-        - resource: code-analysis-source
-          name: source
+        - resource: source-tester-analyzer
+          name: tested-source
     
     - name: deployer
       templateRef:
