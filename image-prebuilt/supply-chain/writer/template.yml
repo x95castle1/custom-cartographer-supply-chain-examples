@@ -50,4 +50,3 @@ spec:
             value: #@ base64.encode(json.encode(data.values.config))
           - name: bundle
             value: #@ image()
-          #@ end
