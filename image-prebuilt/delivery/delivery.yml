@@ -5,12 +5,12 @@ metadata:
 spec:
   selector:
     workload-type: deliver
-    workload-intent: code-analysis
+    workload-intent: image-prebuilt
   resources:
-    - name: source-provider
+    - name: image-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: gitops-source
+        name: deliverable-image-source
 
     - name: deployer
       templateRef:
@@ -21,4 +21,4 @@ spec:
       # every ClusterDeploymentTemplate must be passed exactly one deployment. the deployment
       # is not named (as other inputs can be)
       deployment:
-        resource: source-provider
+        resource: image-provider
