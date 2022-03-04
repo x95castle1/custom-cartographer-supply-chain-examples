@@ -35,8 +35,7 @@ spec:
     metadata:
       name: #@ data.values.workload.metadata.name
       labels:
-        workload-type: deliver
-        workload-intent: image-prebuilt
+         deliverable-intent: image-prebuilt
     spec:
       #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
       serviceAccountName: #@ data.values.workload.spec.serviceAccountName

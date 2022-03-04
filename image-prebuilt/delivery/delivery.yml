@@ -4,12 +4,11 @@ metadata:
   name: delivery-image-prebuilt
 spec:
   selector:
-    workload-type: deliver
-    workload-intent: image-prebuilt
+    deliverable-intent: image-prebuilt
   resources:
     - name: image-provider
       templateRef:
-        kind: ClusterImageTemplate
+        kind: ClusterSourceTemplate
         name: deliverable-image-source
 
     - name: deployer

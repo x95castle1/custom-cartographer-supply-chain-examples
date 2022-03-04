@@ -1,9 +1,10 @@
 apiVersion: carto.run/v1alpha1
-kind: ClusterImageTemplate
+kind: ClusterSourceTemplate
 metadata:
   name: deliverable-image-source
 spec:
-  imagePath: .spec.image
+  revisionPath: .status.artifact.revision
+  urlPath: .status.artifact.url
 
   template:
     apiVersion: source.apps.tanzu.vmware.com/v1alpha1
