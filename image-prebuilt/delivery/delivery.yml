@@ -9,7 +9,7 @@ spec:
   resources:
     - name: image-provider
       templateRef:
-        kind: ClusterSourceTemplate
+        kind: ClusterImageTemplate
         name: deliverable-image-source
 
     - name: deployer
