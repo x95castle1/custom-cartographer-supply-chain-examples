@@ -3,7 +3,7 @@
 apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
-  name: image-prebuilt
+  name: workload-image-prebuilt
   namespace: default
   labels:
     workload-intent: image-prebuilt
