@@ -9,7 +9,7 @@ spec:
     apiVersion: source.apps.tanzu.vmware.com/v1alpha1
     kind: ImageRepository
     metadata:
-      name: $(deliverable.metadata.name)$-app
+      name: $(deliverable.metadata.name)$
     spec:
       serviceAccount: $(deliverable.spec.serviceAccountName)$
       interval: 1m0s
