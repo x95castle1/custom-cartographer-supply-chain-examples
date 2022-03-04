@@ -2,7 +2,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterDeploymentTemplate
 metadata:
-  name: app-deploy
+  name: app-deploy-tpl
 spec:
   observedCompletion:
     succeeded:
