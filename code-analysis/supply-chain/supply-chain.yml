@@ -25,15 +25,15 @@ spec:
     - name: source-provider
       templateRef:
         kind: ClusterSourceTemplate
-        name: git-source
+        name: source
 
-    - name: code-analysis-source
+    - name: source-tester-analyzer
       templateRef:
         kind: ClusterSourceTemplate
-        name: source
+        name: tested-source
       sources:
         - resource: source-provider
-          name: git-source
+          name: source
 
     - name: image-builder
       templateRef:
@@ -43,8 +43,8 @@ spec:
         - name: image_prefix
           value: #@ data.values.image_prefix
       sources:
-        - resource: code-analysis-source
-          name: source
+        - resource: source-tester-analyzer
+          name: tested-source
     
     - name: deployer
       templateRef:
@@ -64,8 +64,8 @@ spec:
 
     - name: git-writer
       templateRef:
-        kind: ClusterTemplate
-        name: git-writer
+        kind: ClusterSourceTemplate 
+        name: git-writer-source # returns the commit sha of what was pushed to git
       configs:
         - resource: config-provider
           name: app-config
@@ -74,3 +74,6 @@ spec:
       templateRef:
         kind: ClusterTemplate
         name: deliverable-template
+      sources:
+        - resource: git-writer
+          name: git-writer-source # commit sha of what git-writter wrote is included in the deliverable

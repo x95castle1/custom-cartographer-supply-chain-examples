@@ -10,10 +10,12 @@ metadata:
 spec:
   serviceAccountName: #@ data.values.service_account_name
   params:
-    - name: registry_server
+    - name: gitops_server
       value: github.com
-    - name: registry_repository
+    - name: gitops_repository
       value: Mpluya/code-analysis-config
+    - name: gitops_branch
+      value: main 
   source:
     git:
       ref:

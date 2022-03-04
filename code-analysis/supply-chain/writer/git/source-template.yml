@@ -1,10 +1,12 @@
 #@ load("@ytt:data", "data")
 
 apiVersion: carto.run/v1alpha1
-kind: ClusterTemplate
+kind: ClusterSourceTemplate
 metadata:
-  name: git-writer
+  name: git-writer-source
 spec:
+  urlPath: .status.outputs.revision # this is unused, yet needs to be valued to be deemed a valid ClusterSourceTemplate output
+  revisionPath: .status.outputs.revision
   params:
     - name: git_writer_username
       default: #@ data.values.git_writer.username

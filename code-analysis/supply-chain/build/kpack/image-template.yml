@@ -23,6 +23,6 @@ spec:
         name: java-builder
       source:
         blob:
-          url: $(sources.source.url)$
+          url: $(sources.tested-source.url)$
       build:
         env: $(workload.spec.build.env)$
