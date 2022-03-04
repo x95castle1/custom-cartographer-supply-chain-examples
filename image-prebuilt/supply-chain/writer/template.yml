@@ -7,7 +7,7 @@ metadata:
 spec:
   params:
   - name: serviceAccount
-    default: default
+    default: ""
   - name: registry
     default: {}
   

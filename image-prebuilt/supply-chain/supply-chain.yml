@@ -18,7 +18,7 @@ spec:
         name: app-deploy
       images:
         - resource: image-provider
-          name: image
+          name: image-source
 
     - name: config-provider
       templateRef:
@@ -26,7 +26,7 @@ spec:
         name: app-config
       images:
         - resource: image-provider
-          name: image
+          name: image-source
 
     # will write config from app-config as json to be pushed by imgpkg
     - name: image-writer

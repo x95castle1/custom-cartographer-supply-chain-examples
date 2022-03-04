@@ -1,43 +1,15 @@
----
-
-apiVersion: tekton.dev/v1beta1
-kind: ClusterTask
+apiVersion: carto.run/v1alpha1
+kind: ClusterRunTemplate
 metadata:
-  name: image-writer
+  name: tekton-taskrun
 spec:
-  description: |-
-    a task that writes a given set of files (provided as a json base64-encoded)
-    to a container image registry as an image making use of the imgpkg bundle
-    format.
-  params:
-  - description: name of the registry + repository to push the bundle to
-    name: bundle
-    type: string
-  - description: |
-      base64-encoded json map of files to write to registry, for example - eyAiUkVBRE1FLm1kIjogIiMgUmVhZG1lIiB9
-    name: files
-    type: string
-  steps:
-  - image: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages@sha256:e5e961933dfc7406d708c88b3226d7fe79266a58b75e2de93ca640ccd310f78d
-    name: main
-    resources: {}
-    script: |-
-      #!/usr/bin/env bash
-
-      set -o errexit
-      set -o xtrace
-
-      cd `mktemp -d`
-
-      echo -e "$(params.files)" | base64 --decode > files.json
-      eval "$(cat files.json | jq -r 'to_entries | .[] | @sh "mkdir -p $(dirname \(.key)) && echo \(.value) > \(.key)"')"
-
-      mkdir -p .imgpkg
-
-      echo -e "---\napiVersion: imgpkg.carvel.dev/v1alpha1\nkind: ImagesLock" > ./.imgpkg/images.yml
-
-      export IMGPKG_ENABLE_IAAS_AUTH=false
-      imgpkg push -b $(params.bundle) -f .
-      cat ./.imgpkg/images.yml
-    securityContext:
-      runAsUser: 0
+  template:
+    apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: $(runnable.metadata.name)$-
+      labels: $(runnable.metadata.labels)$
+    spec:
+      params: $(runnable.spec.inputs.params)$
+      serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
+      taskRef: $(runnable.spec.inputs.taskRef)$
