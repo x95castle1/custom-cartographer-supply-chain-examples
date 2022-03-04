@@ -11,6 +11,6 @@ spec:
     metadata:
       name: $(deliverable.metadata.name)$-app
     spec:
-      serviceAccount: $(workload.spec.serviceAccountName)$
+      serviceAccount: $(deliverable.spec.serviceAccountName)$
       interval: 1m0s
-      image: $(workload.spec.source.image)$
+      image: $(deliverable.spec.source.image)$
