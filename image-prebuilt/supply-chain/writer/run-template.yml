@@ -1,7 +1,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterRunTemplate
 metadata:
-  name: tekton-taskrun
+  name: tekton-taskrun-tpl
 spec:
   template:
     apiVersion: tekton.dev/v1beta1

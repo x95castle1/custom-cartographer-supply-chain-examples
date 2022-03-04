@@ -1,7 +1,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterTemplate
 metadata:
-  name: deliverable-template
+  name: deliverable-tpl
 spec:
   params:
   - default: {}

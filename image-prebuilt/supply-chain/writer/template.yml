@@ -38,13 +38,13 @@ spec:
       serviceAccountName: #@ data.values.workload.spec.serviceAccountName
 
       runTemplateRef:
-        name: tekton-taskrun
+        name: tekton-taskrun-tpl
 
       inputs:
         serviceAccount: #@ data.values.params.serviceAccount
         taskRef:
           kind: ClusterTask
-          name: image-writer
+          name: image-writer-task
         params:
           - name: files
             value: #@ base64.encode(json.encode(data.values.config))

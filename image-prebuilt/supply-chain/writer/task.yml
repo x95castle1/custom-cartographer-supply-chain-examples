@@ -3,7 +3,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: ClusterTask
 metadata:
-  name: image-writer
+  name: image-writer-task
 spec:
   description: |-
     a task that writes a given set of files (provided as a json base64-encoded)

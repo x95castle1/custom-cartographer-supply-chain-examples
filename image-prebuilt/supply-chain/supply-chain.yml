@@ -40,4 +40,4 @@ spec:
     - name: deliverable
       templateRef:
         kind: ClusterTemplate
-        name: deliverable-template
+        name: deliverable-tpl
