@@ -5,34 +5,38 @@ kind: ClusterConfigTemplate
 metadata:
   name: app-config
 spec:
-  configPath: .data.manifest
+  configPath: .data
 
   ytt: |
     #@ load("@ytt:data", "data")
+
+    #@ def delivery():
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: 
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+      name: (@= data.values.workload.metadata.name @)
+    spec:
+      serviceAccountName: (@= data.values.workload.spec.serviceAccountName @)
+      selector:
+        matchLabels:
+          app: (@= data.values.workload.metadata.name @)
+      template:
+        metadata:
+          labels:
+            app: (@= data.values.workload.metadata.name @)
+        spec:
+          containers:
+            - name: main
+              image: (@= data.values.image @)
+    #@ end
+
     apiVersion: v1
     kind: ConfigMap
     metadata:
       name: #@ data.values.workload.metadata.name
     data:
-      #@yaml/text-templated-strings
-      manifest: |
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-          annotations: 
-            kapp.k14s.io/disable-default-label-scoping-rules: ''
-            kapp.k14s.io/disable-default-ownership-label-rules: ''
-          name: (@= data.values.workload.metadata.name @)
-        spec:
-          serviceAccountName: (@= data.values.workload.spec.serviceAccountName @)
-          selector:
-            matchLabels:
-              app: (@= data.values.workload.metadata.name @)
-          template:
-            metadata:
-              labels:
-                app: (@= data.values.workload.metadata.name @)
-            spec:
-              containers:
-                - name: main
-                  image: (@= data.values.image @)
+      delivery.yml: #@ yaml.encode(delivery())
+        
