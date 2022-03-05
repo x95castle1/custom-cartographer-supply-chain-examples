@@ -17,20 +17,20 @@ spec:
       annotations: 
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/disable-default-ownership-label-rules: ''
-      name: (@= data.values.workload.metadata.name @)
+      name: #@ data.values.workload.metadata.name
     spec:
-      serviceAccountName: (@= data.values.workload.spec.serviceAccountName @)
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
       selector:
         matchLabels:
-          app: (@= data.values.workload.metadata.name @)
+          app: #@ data.values.workload.metadata.name
       template:
         metadata:
           labels:
-            app: (@= data.values.workload.metadata.name @)
+            app: #@ data.values.workload.metadata.name
         spec:
           containers:
             - name: main
-              image: (@= data.values.image @)
+              image: #@ data.values.image
     #@ end
 
     apiVersion: v1
