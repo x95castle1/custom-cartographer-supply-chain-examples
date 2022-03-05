@@ -9,7 +9,8 @@ spec:
 
   ytt: |
     #@ load("@ytt:data", "data")
-
+    #@ load("@ytt:yaml", "yaml")
+    
     #@ def delivery():
     apiVersion: apps/v1
     kind: Deployment
