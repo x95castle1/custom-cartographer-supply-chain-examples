@@ -10,7 +10,7 @@ spec:
     - name: image-provider
       templateRef:
         kind: ClusterImageTemplate
-        name: image-source
+        name: image
 
     - name: deployer
       templateRef:
@@ -18,7 +18,7 @@ spec:
         name: app-deploy
       images:
         - resource: image-provider
-          name: image-source
+          name: image
 
     - name: config-provider
       templateRef:
