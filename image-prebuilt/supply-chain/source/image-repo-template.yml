@@ -1,7 +1,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterImageTemplate
 metadata:
-  name: image-source
+  name: image
 spec:
   imagePath: .spec.image
 
