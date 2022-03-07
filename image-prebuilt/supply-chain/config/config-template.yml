@@ -16,18 +16,6 @@ spec:
     #@ load("@ytt:data", "data")
     #@ load("@ytt:yaml", "yaml")
     
-    #@ def image_bundle():
-    #@   return "/".join([
-    #@    data.values.params.registry_server,
-    #@    data.values.params.registry_repository,
-    #@    "-".join([
-    #@      data.values.workload.metadata.name,
-    #@      data.values.workload.metadata.namespace,
-    #@      "bundle",
-    #@    ])
-    #@   ]) + ":" + data.values.workload.metadata.uid
-    #@ end
-
     #@ def delivery():
     apiVersion: apps/v1
     kind: Deployment
@@ -48,7 +36,7 @@ spec:
         spec:
           containers:
             - name: main
-              image: #@ image_bundle()
+              image: #@ data.values.image
     #@ end
 
     apiVersion: v1
