@@ -61,21 +61,5 @@ kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektonc
 
 8. Install [sonarqube](https://docs.sonarqube.org/latest/setup/sonarqube-on-kubernetes/) (skip if you already have a sonarqube instance running in a cluster)
 
-## Run the example in this repo 
-
-> assumes current working directory is `repo root`
-
-Submit a workload to run through a supply chain with the following steps: 
-
-<span>**get source** &rarr; **run test and sonar code quality analysis** &rarr; **build image** &rarr; **deploy** &rarr; **write config**  &rarr; **stamp out a deliverable** </span> and 
-
-Deploy the deliverable produced from the supply chain through cluster delivery with the following steps: 
-
-<span> **get source from the 'write config' (last step) in the supply chain** &rarr; **deploy** </span>
-```
-kapp deploy --yes -a demo -c \
--f <(ytt --ignore-unknown-comments -f workload.yml -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./shared -f values.yml) \
--f <(ytt --ignore-unknown-comments -f ./code-analysis -f values.yml)
-```
+9. Instructions to run the examples here are in the readme doc per usecase subfolder.
 
