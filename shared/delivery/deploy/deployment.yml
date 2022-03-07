@@ -24,5 +24,6 @@ spec:
             url: $(deployment.url)$
       template:
         - ytt: {}
+        - kbld: {}
       deploy:
         - kapp: {}
