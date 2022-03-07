@@ -18,7 +18,7 @@ spec:
     #@ load("@ytt:json", "json")
     #@ load("@ytt:base64", "base64")
 
-    #@ def image():
+    #@ def image_bundle():
     #@   return "/".join([
     #@    data.values.params.registry_server,
     #@    data.values.params.registry_repository,
@@ -51,4 +51,4 @@ spec:
           - name: files
             value: #@ base64.encode(json.encode(data.values.config))
           - name: bundle
-            value: #@ image()
+            value: #@ image_bundle()
