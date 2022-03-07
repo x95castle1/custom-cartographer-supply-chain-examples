@@ -1,0 +1,17 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSourceTemplate
+metadata:
+  name: deliverable-image-source
+spec:
+  revisionPath: .status.artifact.revision
+  urlPath: .status.artifact.url
+
+  template:
+    apiVersion: source.apps.tanzu.vmware.com/v1alpha1
+    kind: ImageRepository
+    metadata:
+      name: $(deliverable.metadata.name)$-app
+    spec:
+      serviceAccount: $(deliverable.spec.serviceAccountName)$
+      interval: 1m0s
+      image: $(deliverable.spec.source.image)$

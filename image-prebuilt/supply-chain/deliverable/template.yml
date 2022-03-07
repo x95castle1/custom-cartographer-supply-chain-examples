@@ -1,0 +1,44 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: deliverable-tpl
+spec:
+  params:
+  - default: {}
+    name: registry
+  ytt: |
+    #@ load("@ytt:data", "data")
+
+    #@ def param(key):
+    #@   if not key in data.values.params:
+    #@     return None
+    #@   end
+    #@   return data.values.params[key]
+    #@ end
+
+    #@ def image():
+    #@   return "/".join([
+    #@    data.values.params.registry_server,
+    #@    data.values.params.registry_repository,
+    #@    "-".join([
+    #@      data.values.workload.metadata.name,
+    #@      data.values.workload.metadata.namespace,
+    #@      "bundle",
+    #@    ])
+    #@   ]) + ":" + data.values.workload.metadata.uid
+    #@ end
+
+
+    ---
+    apiVersion: carto.run/v1alpha1
+    kind: Deliverable
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      labels:
+         deliverable-intent: image-prebuilt
+    spec:
+      #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+
+      source:
+        image: #@ image()

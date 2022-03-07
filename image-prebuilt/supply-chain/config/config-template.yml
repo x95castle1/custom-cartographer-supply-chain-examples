@@ -1,0 +1,44 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterConfigTemplate
+metadata:
+  name: app-config
+spec:
+  configPath: .data
+  params:
+  - name: registry_server
+    default: ""
+  - name: registry_repository
+    default: ""
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:yaml", "yaml")
+    
+    #@ def delivery():
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: #@ data.values.workload.metadata.name + "-app"
+    spec:
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+      selector:
+        matchLabels:
+          app: #@ data.values.workload.metadata.name
+      template:
+        metadata:
+          labels:
+            app: #@ data.values.workload.metadata.name
+        spec:
+          containers:
+            - name: main
+              image: #@ data.values.image
+    #@ end
+
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: #@ data.values.workload.metadata.name
+    data:
+      delivery.yml: #@ yaml.encode(delivery())

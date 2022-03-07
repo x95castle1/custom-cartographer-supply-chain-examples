@@ -1,0 +1,54 @@
+#@ load("@ytt:data", "data")
+
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: image-writer
+spec:
+  params:
+  - name: serviceAccount
+    default: ""
+  - name: registry_server
+    default: ""
+  - name: registry_repository
+    default: ""
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:json", "json")
+    #@ load("@ytt:base64", "base64")
+
+    #@ def image_bundle():
+    #@   return "/".join([
+    #@    data.values.params.registry_server,
+    #@    data.values.params.registry_repository,
+    #@    "-".join([
+    #@      data.values.workload.metadata.name,
+    #@      data.values.workload.metadata.namespace,
+    #@      "bundle",
+    #@    ])
+    #@   ]) + ":" + data.values.workload.metadata.uid
+    #@ end
+
+    ---
+    apiVersion: carto.run/v1alpha1
+    kind: Runnable
+    metadata:
+      name: #@ data.values.workload.metadata.name + "-config-writer"
+    spec:
+      #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+
+      runTemplateRef:
+        name: tekton-taskrun-tpl
+
+      inputs:
+        serviceAccount: #@ data.values.params.serviceAccount
+        taskRef:
+          kind: ClusterTask
+          name: image-writer-task
+        params:
+          - name: files
+            value: #@ base64.encode(json.encode(data.values.config))
+          - name: bundle
+            value: #@ image_bundle()

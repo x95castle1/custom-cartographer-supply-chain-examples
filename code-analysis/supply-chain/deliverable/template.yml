@@ -28,7 +28,8 @@ spec:
     metadata:
       name: #@ data.values.workload.metadata.name
       labels:
-        app.tanzu.vmware.com/workload-type: deliver
+        workload-type: deliver
+        workload-intent: code-analysis
     spec:
       serviceAccountName: #@ data.values.workload.spec.serviceAccountName
       source:
