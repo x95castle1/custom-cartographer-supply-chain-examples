@@ -6,11 +6,28 @@ metadata:
   name: app-config
 spec:
   configPath: .data
+  params:
+  - name: registry_server
+    default: ""
+  - name: registry_repository
+    default: ""
 
   ytt: |
     #@ load("@ytt:data", "data")
     #@ load("@ytt:yaml", "yaml")
     
+    #@ def image():
+    #@   return "/".join([
+    #@    data.values.params.registry_server,
+    #@    data.values.params.registry_repository,
+    #@    "-".join([
+    #@      data.values.workload.metadata.name,
+    #@      data.values.workload.metadata.namespace,
+    #@      "bundle",
+    #@    ])
+    #@   ]) + ":" + data.values.workload.metadata.uid
+    #@ end
+
     #@ def delivery():
     apiVersion: apps/v1
     kind: Deployment
@@ -31,7 +48,7 @@ spec:
         spec:
           containers:
             - name: main
-              image: #@ data.values.image
+              image: #@ image()
     #@ end
 
     apiVersion: v1
