@@ -16,7 +16,7 @@ spec:
     #@ load("@ytt:data", "data")
     #@ load("@ytt:yaml", "yaml")
     
-    #@ def image():
+    #@ def image_bundle():
     #@   return "/".join([
     #@    data.values.params.registry_server,
     #@    data.values.params.registry_repository,
@@ -48,7 +48,7 @@ spec:
         spec:
           containers:
             - name: main
-              image: #@ image()
+              image: #@ image_bundle()
     #@ end
 
     apiVersion: v1
