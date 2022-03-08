@@ -36,7 +36,7 @@ spec:
         - resource: image-scanner
           name: image
 
-    # writes config from app-config as json to be pushed by imgpkg
+    # writes config from app-config to be pushed as a bundle by imgpkg
     - name: image-writer
       templateRef:
         kind: ClusterTemplate
