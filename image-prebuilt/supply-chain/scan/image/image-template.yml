@@ -14,6 +14,6 @@ spec:
         app.kubernetes.io/component: image-scan
     spec:
       registry:
-        image: #@ data.values.image
+        image: #@ data.values.images.prebuilt-image.image
       scanTemplate: image-scan-template
-      scanPolicy: scan-policy
+      scanPolicy: sample-scan-policy

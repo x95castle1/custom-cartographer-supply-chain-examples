@@ -10,16 +10,22 @@ spec:
     - name: image-provider
       templateRef:
         kind: ClusterImageTemplate
+        name: prebuilt-image
+
+    - name: image-scanner
+      templateRef:
+        kind: ClusterImageTemplate
         name: image
-
-    # add image scan
-
+      images:
+        - resource: image-provider
+          name: prebuilt-image
+  
     - name: deployer
       templateRef:
         kind: ClusterTemplate
         name: app-deploy
       images:
-        - resource: image-provider
+        - resource: image-scanner
           name: image
 
     - name: config-provider
@@ -27,7 +33,7 @@ spec:
         kind: ClusterConfigTemplate
         name: app-config
       images:
-        - resource: image-provider
+        - resource: image-scanner
           name: image
 
     # writes config from app-config as json to be pushed by imgpkg
