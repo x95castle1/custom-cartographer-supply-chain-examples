@@ -41,6 +41,6 @@ spec:
       name: docker
     - emptyDir: {}
       name: workspace
-    - name: reg-cred
+    - name: registry-cred
       secret:
-        secretName: registry-credentials
+        secretName: reg-cred
