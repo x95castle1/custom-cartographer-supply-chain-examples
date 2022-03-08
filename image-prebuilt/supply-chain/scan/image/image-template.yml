@@ -1,0 +1,19 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterImageTemplate
+metadata:
+  name: image
+spec:
+  imagePath: .status.compliantArtifact.registry.image
+  ytt: |
+    #@ load("@ytt:data", "data")
+    apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
+    kind: ImageScan
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      labels:
+        app.kubernetes.io/component: image-scan
+    spec:
+      registry:
+        image: #@ data.values.image
+      scanTemplate: image-scan-template
+      scanPolicy: sample-scan-policy

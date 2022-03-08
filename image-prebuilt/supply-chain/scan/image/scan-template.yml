@@ -1,0 +1,46 @@
+apiVersion: scanning.apps.tanzu.vmware.com/v1beta1
+kind: ScanTemplate
+metadata:
+  name: image-scan-template
+  namespace: default
+spec:
+  template:
+    containers:
+    - args:
+      - -c
+      - ./image/copy-docker-config.sh /secret-data && ./image/scan-image.sh /workspace
+        scan.xml true
+      command:
+      - /bin/bash
+      image: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages@sha256:bdce1113e2c940305fa9fd34d7cae2dce247c3e309fcd442efc769b590aa19e4
+      imagePullPolicy: IfNotPresent
+      name: scanner
+      resources:
+        limits:
+          cpu: 1000m
+        requests:
+          cpu: 250m
+          memory: 128Mi
+      volumeMounts:
+      - mountPath: /.docker
+        name: docker
+        readOnly: false
+      - mountPath: /workspace
+        name: workspace
+        readOnly: false
+      - mountPath: /secret-data
+        name: registry-cred
+        readOnly: true
+    imagePullSecrets:
+    - name: scanner-reg-cred
+    restartPolicy: Never
+    securityContext:
+      runAsNonRoot: true
+    volumes:
+    - emptyDir: {}
+      name: docker
+    - emptyDir: {}
+      name: workspace
+    - name: registry-cred
+      secret:
+        secretName: reg-cred

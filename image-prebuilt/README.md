@@ -3,6 +3,12 @@
 ## Prerequisites
 
 1. source.apps.tanzu.vmware.com imagerepositories custom resource
+    https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-source-controller-about.html
+
+2. scanning.apps.tanzu.vmware.com/v1beta1 ImageScan
+
+    https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-scst-scan-overview.html
+
 
 ## Run
 > assumes current working directory is `repo-root/image-prebuilt`:
