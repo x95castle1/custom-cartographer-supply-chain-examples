@@ -2,14 +2,17 @@
 
 ## Prerequisites
 
-1. Install the [git-cli task](https://github.com/tektoncd/catalog/tree/main/task/git-cli/0.2) from the
+1. Install flux [source-controller](https://fluxcd.io/docs/gitops-toolkit/source-watcher/#install-flux) for providing the ability to find new commits to a git
+  repository and making it internally available to other resources.
+
+2. Install the [git-cli task](https://github.com/tektoncd/catalog/tree/main/task/git-cli/0.2) from the
   [tekton catalog](https://github.com/tektoncd/catalog). This is used to write to the git repo.
 
 ```bash
 kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-cli/0.2/git-cli.yaml
 ```
 
-2. Install [sonarqube](https://docs.sonarqube.org/latest/setup/sonarqube-on-kubernetes/) (skip if you already have a sonarqube instance running in a cluster)
+3. Install [sonarqube](https://docs.sonarqube.org/latest/setup/sonarqube-on-kubernetes/) (skip if you already have a sonarqube instance running in a cluster)
 
 ## Run
 

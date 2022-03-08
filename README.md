@@ -32,9 +32,6 @@ Install the following utilities as well as Cartographer!
   for providing an opinionated way of continuously building container
   images using buildpacks
 
-- [source-controller](https://fluxcd.io/docs/gitops-toolkit/source-watcher/#install-flux),
-  for providing the ability to find new commits to a git
-  repository and making it internally available to other resources
 
 - [kapp-controller](https://carvel.dev/kapp-controller/docs/latest/install/),
   for providing us with the ability of deploying multiple
