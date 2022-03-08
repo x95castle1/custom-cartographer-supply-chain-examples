@@ -52,14 +52,5 @@ export TEKTON_VERSION=0.30.0
 kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/previous/v$TEKTON_VERSION/release.yaml
 ```
 
-7. Install the [git-cli task](https://github.com/tektoncd/catalog/tree/main/task/git-cli/0.2) from the
-  [tekton catalog](https://github.com/tektoncd/catalog). This is used to write to the git repo.
-
-```bash
-kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-cli/0.2/git-cli.yaml
-```
-
-8. Install [sonarqube](https://docs.sonarqube.org/latest/setup/sonarqube-on-kubernetes/) (skip if you already have a sonarqube instance running in a cluster)
-
-9. Instructions to run the examples here are in the readme doc per usecase subfolder.
+7. Additional setup and instructions to run the examples here are in the readme doc per usecase subfolder.
 

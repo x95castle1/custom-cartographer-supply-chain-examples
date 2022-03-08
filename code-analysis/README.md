@@ -1,5 +1,18 @@
 ## Run the code-analysis use case
 
+## Prerequisites
+
+1. Install the [git-cli task](https://github.com/tektoncd/catalog/tree/main/task/git-cli/0.2) from the
+  [tekton catalog](https://github.com/tektoncd/catalog). This is used to write to the git repo.
+
+```bash
+kapp deploy --yes -a tekton-git-cli -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-cli/0.2/git-cli.yaml
+```
+
+2. Install [sonarqube](https://docs.sonarqube.org/latest/setup/sonarqube-on-kubernetes/) (skip if you already have a sonarqube instance running in a cluster)
+
+## Run
+
 > assumes current working directory is `repo-root/code-analysis`
 
 Submit a workload to run through a supply chain with the following steps: 
