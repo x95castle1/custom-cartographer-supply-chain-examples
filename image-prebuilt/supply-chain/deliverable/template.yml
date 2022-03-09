@@ -9,13 +9,6 @@ spec:
   ytt: |
     #@ load("@ytt:data", "data")
 
-    #@ def param(key):
-    #@   if not key in data.values.params:
-    #@     return None
-    #@   end
-    #@   return data.values.params[key]
-    #@ end
-
     #@ def image():
     #@   return "/".join([
     #@    data.values.params.registry_server,
