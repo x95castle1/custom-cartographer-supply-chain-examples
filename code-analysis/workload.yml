@@ -6,6 +6,7 @@ metadata:
   name: code-analysis
   namespace: default
   labels:
+    app.kubernetes.io/part-of: code-analysis
     workload-intent: code-analysis
 spec:
   serviceAccountName: #@ data.values.service_account_name

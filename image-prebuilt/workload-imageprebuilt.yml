@@ -6,6 +6,7 @@ metadata:
   name: image-prebuilt
   namespace: default
   labels:
+    app.kubernetes.io/part-of: image-prebuilt
     workload-intent: image-prebuilt
 spec:
   serviceAccountName: #@ data.values.service_account_name
