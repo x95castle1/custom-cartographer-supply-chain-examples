@@ -28,6 +28,12 @@ tanzu package install source-controller -p controller.source.apps.tanzu.vmware.c
 tanzu package install scan-controller --package-name scanning.apps.tanzu.vmware.com --version [x.x.x]
 ```
 
+4. Install Supply Chain Security Tools - Store
+```bash
+tanzu package install metadata-store --package-name metadata-store.apps.tanzu.vmware.com --version [x.x.x]
+```
+
+
 ## Run
 > assumes current working directory is `repo-root/image-prebuilt`:
 ```
@@ -35,3 +41,6 @@ kapp deploy --yes -a image-prebuilt-demo -c \
 -f <(ytt --ignore-unknown-comments -f . -f ../values.yml) \
 -f <(ytt --ignore-unknown-comments -f ../shared -f ../values.yml)
 ```
+
+## View scan results
+Follow the instructions [here](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-scst-store-additional.html)
