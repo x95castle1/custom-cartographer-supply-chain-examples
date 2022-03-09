@@ -32,7 +32,7 @@ spec:
         name: registry-cred
         readOnly: true
     imagePullSecrets:
-    - name: scanner-reg-cred
+    - name: tanzu-reg-cred
     restartPolicy: Never
     securityContext:
       runAsNonRoot: true

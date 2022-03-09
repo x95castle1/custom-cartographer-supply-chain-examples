@@ -6,8 +6,6 @@ metadata:
   name: image-writer
 spec:
   params:
-  - name: serviceAccount
-    default: ""
   - name: registry_server
     default: ""
   - name: registry_repository
@@ -43,7 +41,7 @@ spec:
         name: tekton-taskrun-tpl
 
       inputs:
-        serviceAccount: #@ data.values.params.serviceAccount
+        serviceAccount: #@ data.values.workload.spec.serviceAccountName
         taskRef:
           kind: ClusterTask
           name: image-writer-task
