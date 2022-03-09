@@ -28,8 +28,8 @@ spec:
     metadata:
       name: #@ data.values.workload.metadata.name
       labels:
-         deliverable-intent: image-prebuilt
-         #@ if/end hasattr(data.values.workload.metadata, "labels") and hasattr(data.values.workload.metadata.labels, "app.kubernetes.io/part-of"):
+        deliverable-intent: image-prebuilt
+        #@ if/end hasattr(data.values.workload.metadata, "labels") and hasattr(data.values.workload.metadata.labels, "app.kubernetes.io/part-of"):
         app.kubernetes.io/part-of: #@ data.values.workload.metadata.labels["app.kubernetes.io/part-of"]
     spec:
       #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
