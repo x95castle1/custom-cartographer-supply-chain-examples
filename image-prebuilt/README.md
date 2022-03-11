@@ -1,5 +1,9 @@
 ## Run the image-prebuilt use case
 
+This example can be run alongside an existing TAP installation that has the out of the box supply chain - testing and scanning.
+If you wish to run this on a cluster that doesnt have TAP, the steps in the prerequisites section are required.
+Either approaches (with or without pre-existing TAP install) have been validated and should work.
+
 ## Prerequisites
 1. Add Tanzu TAP repository
 

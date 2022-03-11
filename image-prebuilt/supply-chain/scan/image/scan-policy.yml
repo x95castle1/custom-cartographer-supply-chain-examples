@@ -12,7 +12,7 @@ items:
       default isCompliant = false
 
       # Accepted Values: "Critical", "High", "Medium", "Low", "Negligible", "UnknownSeverity"
-      violatingSeverities := ["UnknownSeverity"] #should include critical, high, and medium but temporarily defaulting to just unknown for demo purposes
+      violatingSeverities := ["UnknownSeverity"] # ATTENTION: this should include Critical, High, and Medium but temporarily defaulting to just UnknownSeverity for demo purposes
       ignoreCVEs := []
 
       contains(array, elem) = true {
