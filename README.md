@@ -49,5 +49,5 @@ export TEKTON_VERSION=0.30.0
 kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/previous/v$TEKTON_VERSION/release.yaml
 ```
 
-7. Additional setup and instructions to run the examples here are in the readme doc per usecase subfolder.
+7. Additional setup instructions to run the examples here are in the readme doc per usecase subfolder.
 
