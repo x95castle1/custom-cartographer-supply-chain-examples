@@ -1,0 +1,27 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterRunTemplate
+metadata:
+  name: github-open-pr-taskrun
+spec:
+  template:
+    apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: $(runnable.metadata.name)$-
+      labels: 
+        $(runnable.metadata.labels)$
+    spec:
+      serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
+      taskRef: {name: $(selected.metadata.name)$}
+      params: $(runnable.spec.inputs.params)$
+      # params:
+      # - name: REPO_FULL_NAME
+      #   value: $(runnable.spec.inputs.source-url)$ 
+      # - name: HEAD
+      #   value: $(runnable.spec.inputs.source-revision)$
+      # - name: BASE
+      #   value: main
+      # - name: TITLE
+      #   value: "Supply chain produced deliverable"
+      # - name: BODY
+      #   value: "Please review the updated artifacts."
