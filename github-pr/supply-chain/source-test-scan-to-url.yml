@@ -127,6 +127,13 @@ spec:
     sources:
       - resource: config-writer
         name: config-writer-source-template
+    params:
+    - name: pr_target_branch
+      default: "main"
+    - name: pr_title
+      default: "Supply chain produced a deliverable"
+    - name: pr_body
+      default: "Please review the updated artifacts."
   selector:
     apps.tanzu.vmware.com/has-tests: "true"
     apps.tanzu.vmware.com/workload-type: web
