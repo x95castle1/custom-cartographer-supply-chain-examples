@@ -12,11 +12,14 @@ spec:
     default: "Supply chain produced a deliverable"
   - name: pr_body
     default: "Please review the updated artifacts."
+  - name: serviceAccount
+    default: default
+    
   ytt: |
     #@ load("@ytt:data", "data")
 
     #@ def repo_host():
-    #@   source_url = data.values.sources.url
+    #@   source_url = data.values.source.url
     #@   if source_url.startswith("ssh"):
     #@     return (source_url.split("ssh://git@github.com/")[1]).split(".git")[0] 
     #@   end
@@ -30,6 +33,7 @@ spec:
     metadata:
       name: #@ data.values.workload.metadata.name + "-pull-request"
       labels:
+        tekton.dev/task: github-open-pr
         app.kubernetes.io/component: pull-request
         #@ if/end hasattr(data.values.workload.metadata, "labels") and hasattr(data.values.workload.metadata.labels, "app.kubernetes.io/part-of"):
         app.kubernetes.io/part-of: #@ data.values.workload.metadata.labels["app.kubernetes.io/part-of"]
@@ -40,19 +44,17 @@ spec:
       runTemplateRef:
         name: github-open-pr-taskrun
 
+      selector:
+        resource:
+          apiVersion: tekton.dev/v1beta1
+          kind: Task
+        matchingLabels:
+          task: open-github-pr
+
       inputs:
         serviceAccount: #@ data.values.params.serviceAccount
-        taskRef:
-          kind: ClusterTask
-          name: github-open-pr-task
-        params:
-          - name: REPO_FULL_NAME
-            value: #@ repo_host()
-          - name: HEAD
-            value: #@ data.values.sources.revision
-          - name: BASE
-            value: #@ param("pr_target_branch")
-          - name: TITLE
-            value: #@ param("pr_title")
-          - name: BODY
-            value: #@ param("pr_body")
+        repo: #@ repo_host()
+        fromBranch: "test"
+        toBranch: #@ data.values.params.pr_target_branch
+        title: #@ data.values.params.pr_title
+        body: #@ data.values.params.pr_body

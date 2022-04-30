@@ -1,10 +1,9 @@
----
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: github-open-pr-task
   labels:
-    app.kubernetes.io/version: "0.2"
+    task: open-github-pr
   annotations:
     tekton.dev/categories: Git
     tekton.dev/pipelines.minVersion: "0.12.1"
