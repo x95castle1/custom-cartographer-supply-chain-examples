@@ -54,7 +54,7 @@ spec:
       inputs:
         serviceAccount: #@ data.values.params.serviceAccount
         repo: #@ repo_host()
-        fromBranch: "test"
+        fromBranch: #@ data.values.source.revision
         toBranch: #@ data.values.params.pr_target_branch
         title: #@ data.values.params.pr_title
         body: #@ data.values.params.pr_body
