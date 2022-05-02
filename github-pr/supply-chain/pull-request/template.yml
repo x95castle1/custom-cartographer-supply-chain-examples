@@ -6,8 +6,6 @@ metadata:
   name: pull-request
 spec:
   params:
-  - name: pr_target_branch
-    default: "main"
   - name: pr_title
     default: "Supply chain produced a deliverable"
   - name: pr_body
@@ -55,6 +53,6 @@ spec:
         serviceAccount: #@ data.values.params.serviceAccount
         repo: #@ repo_host()
         fromBranch: #@ data.values.source.revision
-        toBranch: #@ data.values.params.pr_target_branch
+        toBranch: #@ data.values.params["gitops_branch"]
         title: #@ data.values.params.pr_title
         body: #@ data.values.params.pr_body

@@ -88,28 +88,16 @@ spec:
       kind: ClusterConfigTemplate
       name: config-template
 
-  # - configs:
-  #   - name: config
-  #     resource: app-config
-  #   name: config-writer
-  #   params:
-  #   - name: serviceAccount
-  #     value: default
-  #   - name: registry
-  #     value:
-  #       repository: tapsme
-  #       server: index.docker.io
-  #   templateRef:
-  #     kind: ClusterSourceTemplate
-  #     name: config-writer-source-template # returns the commit sha of what was pushed to git
-  
   - name: config-writer
     templateRef:
       kind: ClusterSourceTemplate
-      name: config-writer-source-template # returns the commit sha of what was pushed to git
+      name: config-writer-source-template
     configs:
     - resource: app-config
       name: config
+    sources:
+      - resource: source-provider
+        name: source
     params:
     - name: serviceAccount
       value: default
@@ -118,8 +106,6 @@ spec:
         repository: tapsme
         server: index.docker.io
 
-
-
   - name: github-pull-request
     templateRef:
       kind: ClusterTemplate
@@ -127,13 +113,7 @@ spec:
     sources:
       - resource: config-writer
         name: config-writer-source-template
-    params:
-    - name: pr_target_branch
-      default: "main"
-    - name: pr_title
-      default: "Supply chain produced a deliverable"
-    - name: pr_body
-      default: "Please review the updated artifacts."
+
   selector:
     apps.tanzu.vmware.com/has-tests: "true"
     apps.tanzu.vmware.com/workload-type: web

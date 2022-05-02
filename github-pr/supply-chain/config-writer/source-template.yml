@@ -47,6 +47,10 @@ spec:
     #@   return prefix + data.values.workload.metadata.name + ".git"
     #@ end
 
+    #@ def git_revision():
+    #@   return (data.values.source.revision.split("/")[1])[0:7]
+    #@ end
+
     #@ def image():
     #@   return "/".join([
     #@    data.values.params.registry.server,
@@ -86,7 +90,7 @@ spec:
           - name: git_repository
             value: #@ git_repository()
           - name: git_branch
-            value: #@ param("gitops_branch")
+            value: #@ git_revision()
           - name: git_user_name
             value: #@ param("gitops_user_name")
           - name: git_user_email
