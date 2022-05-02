@@ -88,6 +88,7 @@ spec:
       kind: ClusterConfigTemplate
       name: config-template
 
+  # updated config writer template
   - name: config-writer
     templateRef:
       kind: ClusterSourceTemplate
@@ -96,8 +97,8 @@ spec:
     - resource: app-config
       name: config
     sources:
-      - resource: source-provider
-        name: source
+      - resource: source-scanner
+        name: source-scanner-template
     params:
     - name: serviceAccount
       value: default
@@ -105,6 +106,7 @@ spec:
       value:
         repository: tapsme
         server: index.docker.io
+  # end updated config writer template
 
   - name: github-pull-request
     templateRef:
