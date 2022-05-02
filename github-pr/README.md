@@ -5,7 +5,7 @@ This is an enhancement on top of the out of the box supply chain templates provi
 ## Assumption
 TAP is installed including any of the out of the box supply chains.
 
-## Prerequisites
+## Installation
 1. Follow the instructions for making [Live modification of supply chains and templates](https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-scc-authoring-supply-chains.html#live-modification-of-supply-chains-and-templates-6). 
 
     Below are the actual steps taken:
