@@ -13,7 +13,6 @@ spec:
     spec:
       serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
       taskRef: {name: $(selected.metadata.name)$}
-      # params: $(runnable.spec.inputs.params)$
       params:
         - name: REPO_FULL_NAME
           value: $(runnable.spec.inputs.repo)$
