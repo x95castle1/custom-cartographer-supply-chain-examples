@@ -1,0 +1,107 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSourceTemplate
+metadata:
+  name: config-writer-source-template
+spec:
+  urlPath: .status.outputs.url
+  revisionPath: .status.outputs.revision
+  params:
+  - default: default
+    name: serviceAccount
+  - default: {}
+    name: registry
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:json", "json")
+    #@ load("@ytt:base64", "base64")
+
+    #@ def has_git_params():
+    #@   if 'gitops_repository_prefix' in data.values.params:
+    #@     return True
+    #@   end
+    #@
+    #@   if 'gitops_repository' in data.values.params:
+    #@     return True
+    #@   end
+    #@
+    #@   return False
+    #@ end
+
+    #@ def is_gitops():
+    #@   return has_git_params()
+    #@ end
+
+    #@ def param(key):
+    #@   if not key in data.values.params:
+    #@     return None
+    #@   end
+    #@   return data.values.params[key]
+    #@ end
+
+    #@ def git_repository():
+    #@   if 'gitops_repository' in data.values.params:
+    #@     return param("gitops_repository")
+    #@   end
+    #@
+    #@   prefix = param("gitops_repository_prefix")
+    #@   return prefix + data.values.workload.metadata.name + ".git"
+    #@ end
+
+    #@ def git_revision():
+    #@   return (data.values.source.revision.split("/")[1])[0:7]
+    #@ end
+
+    #@ def image():
+    #@   return "/".join([
+    #@    data.values.params.registry.server,
+    #@    data.values.params.registry.repository,
+    #@    "-".join([
+    #@      data.values.workload.metadata.name,
+    #@      data.values.workload.metadata.namespace,
+    #@      "bundle",
+    #@    ])
+    #@   ]) + ":" + data.values.workload.metadata.uid
+    #@ end
+
+
+    ---
+    apiVersion: carto.run/v1alpha1
+    kind: Runnable
+    metadata:
+      name: #@ data.values.workload.metadata.name + "-config-writer"
+      labels:
+        app.kubernetes.io/component: config-writer
+        #@ if/end hasattr(data.values.workload.metadata, "labels") and hasattr(data.values.workload.metadata.labels, "app.kubernetes.io/part-of"):
+        app.kubernetes.io/part-of: #@ data.values.workload.metadata.labels["app.kubernetes.io/part-of"]
+    spec:
+      #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+
+      runTemplateRef:
+        name: tekton-taskrun
+
+      inputs:
+        serviceAccount: #@ data.values.params.serviceAccount
+        taskRef:
+          kind: ClusterTask
+          name: #@ "git-writer" if is_gitops() else "image-writer"
+        params:
+          #@ if is_gitops():
+          - name: git_repository
+            value: #@ git_repository()
+          - name: git_branch
+            value: #@ git_revision()
+          - name: git_user_name
+            value: #@ param("gitops_user_name")
+          - name: git_user_email
+            value: #@ param("gitops_user_email")
+          - name: git_commit_message
+            value: #@ param("gitops_commit_message")
+          - name: git_files
+            value: #@ base64.encode(json.encode(data.values.config))
+          #@ else:
+          - name: files
+            value: #@ base64.encode(json.encode(data.values.config))
+          - name: bundle
+            value: #@ image()
+          #@ end

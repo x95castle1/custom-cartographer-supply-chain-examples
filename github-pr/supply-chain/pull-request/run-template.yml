@@ -1,0 +1,26 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterRunTemplate
+metadata:
+  name: github-open-pr-taskrun
+spec:
+  template:
+    apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: $(runnable.metadata.name)$-
+      labels:
+        $(runnable.metadata.labels)$
+    spec:
+      serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
+      taskRef: {name: $(selected.metadata.name)$}
+      params:
+        - name: REPO_FULL_NAME
+          value: $(runnable.spec.inputs.repo)$
+        - name: HEAD
+          value: $(runnable.spec.inputs.fromBranch)$
+        - name: BASE
+          value: $(runnable.spec.inputs.toBranch)$
+        - name: TITLE
+          value: $(runnable.spec.inputs.title)$
+        - name: BODY
+          value: $(runnable.spec.inputs.body)$

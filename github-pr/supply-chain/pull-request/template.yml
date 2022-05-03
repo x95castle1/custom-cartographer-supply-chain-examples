@@ -1,0 +1,58 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: pull-request
+spec:
+  params:
+  - name: pr_title
+    default: "Supply chain produced a deliverable"
+  - name: pr_body
+    default: "Please review the updated artifacts."
+  - name: serviceAccount
+    default: default
+    
+  ytt: |
+    #@ load("@ytt:data", "data")
+
+    #@ def repo_host():
+    #@   source_url = data.values.source.url
+    #@   if source_url.startswith("ssh"):
+    #@     return (source_url.split("ssh://git@github.com/")[1]).split(".git")[0] 
+    #@   end
+    #@   
+    #@   return (source_url.split("https://git@github.com/")[1]).split(".git")[0]
+    #@ end
+
+    ---
+    apiVersion: carto.run/v1alpha1
+    kind: Runnable
+    metadata:
+      name: #@ data.values.workload.metadata.name + "-pull-request"
+      labels:
+        tekton.dev/task: github-open-pr
+        app.kubernetes.io/component: pull-request
+        #@ if/end hasattr(data.values.workload.metadata, "labels") and hasattr(data.values.workload.metadata.labels, "app.kubernetes.io/part-of"):
+        app.kubernetes.io/part-of: #@ data.values.workload.metadata.labels["app.kubernetes.io/part-of"]
+    spec:
+      #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+
+      runTemplateRef:
+        name: github-open-pr-taskrun
+
+      selector:
+        resource:
+          apiVersion: tekton.dev/v1beta1
+          kind: Task
+        matchingLabels:
+          task: open-github-pr
+
+      inputs:
+        serviceAccount: #@ data.values.params.serviceAccount
+        repo: #@ repo_host()
+        fromBranch: #@ data.values.source.revision
+        toBranch: #@ data.values.params["gitops_branch"]
+        title: #@ data.values.params.pr_title
+        body: #@ data.values.params.pr_body
