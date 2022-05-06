@@ -28,15 +28,6 @@ spec:
     templateRef:
       kind: ClusterSourceTemplate
       name: source-template
-  # - name: deliverable
-  #   params:
-  #   - name: registry
-  #     value:
-  #       repository: tapsme
-  #       server: index.docker.io
-  #   templateRef:
-  #     kind: ClusterTemplate
-  #     name: deliverable-template
   - name: image-builder
     params:
     - name: serviceAccount
