@@ -42,22 +42,22 @@ cross-cluster communication.
     kind: Config
     clusters:
     - cluster:
-        certificate-authority-data: ${​ca}​ 
-        server: ${​server}​
-    name: ${​clusterName}
+        certificate-authority-data: ${ca}
+        server: ${server}
+    name: ${clusterName}
     contexts:
     - context:
-        cluster: ${​clusterName}​ 
-        user: ${​serviceAccount}
-    name: ${​serviceAccount}​@${​clusterName}​ 
-    current-context: ${​serviceAccount}​@${​clusterName}
+        cluster: ${clusterName}
+        user: ${serviceAccount}
+    name: ${serviceAccount}@${clusterName}
+    current-context: ${serviceAccount}@${clusterName}
     users:
-    - name: ${​serviceAccount}​    
+    - name: ${serviceAccount}
     user:
-        token: ${​token}​
+        token: ${token}
     ```
 
-    Sample command to create kubeconfig as a secret. Note that this secret should be created in your TAP cluster where you submit a workload (e.g. build cluster)
+    Sample command to create kubeconfig as a secret. **Note that this secret should be created in your TAP cluster where you submit a workload (e.g. build cluster)**. Expect future enhancements on this. 
     ```
     kubectl -n default create secret generic kubeconfig-deliverable-reconciler-secret --from-file=value=./kubeconfig.yml
     ```
