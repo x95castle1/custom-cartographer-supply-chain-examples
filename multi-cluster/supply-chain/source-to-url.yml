@@ -1,0 +1,98 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSupplyChain
+metadata:
+  name: source-to-url
+spec:
+  params:
+  - name: deliverable_repository
+    default: ssh://git@github.com/Mpluya/unicorn-run-qa-deliverable.git
+  - name: deliverable_branch
+    default: main
+  - default: main
+    name: gitops_branch
+  - default: supplychain
+    name: gitops_user_name
+  - default: supplychain
+    name: gitops_user_email
+  - default: supplychain@cluster.local
+    name: gitops_commit_message
+  - default: ""
+    name: gitops_ssh_secret
+  resources:
+  - name: source-provider
+    params:
+    - name: serviceAccount
+      value: default
+    - name: gitImplementation
+      value: go-git
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: source-template
+  - name: image-builder
+    params:
+    - name: serviceAccount
+      value: default
+    - name: clusterBuilder
+      value: default
+    - name: registry
+      value:
+        repository: tapsme
+        server: index.docker.io
+    sources:
+    - name: source
+      resource: source-provider
+    templateRef:
+      kind: ClusterImageTemplate
+      name: kpack-template
+  - images:
+    - name: image
+      resource: image-builder
+    name: config-provider
+    params:
+    - name: serviceAccount
+      value: default
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: convention-template
+  - configs:
+    - name: config
+      resource: config-provider
+    name: app-config
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: config-template
+  - configs:
+    - name: config
+      resource: app-config
+    name: app-config-writer
+    params:
+    - name: serviceAccount
+      value: default
+    - name: registry
+      value:
+        repository: tapsme
+        server: index.docker.io
+    templateRef:
+      kind: ClusterTemplate
+      name: config-writer-template
+
+  - configs:
+    name: deliverable-config
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: config-deliverable-template
+  
+  - name: deliverable-config-writer
+    configs:
+    - name: config
+      resource: deliverable-config    
+    params:
+    - name: serviceAccount
+      value: default
+    templateRef:
+      kind: ClusterTemplate
+      name: config-writer-deliverable-template
+
+
+  selector:
+    apps.tanzu.vmware.com/workload-type: web

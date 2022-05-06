@@ -1,0 +1,25 @@
+apiVersion: kappctrl.k14s.io/v1alpha1
+kind: App
+metadata:
+  name: deliverable-to-run-cluster-reconciler
+  namespace: default
+spec:
+  cluster:
+    # specifies namespace in destination cluster (optional)
+    namespace: default
+    # specifies secret containing kubeconfig (required)
+    kubeconfigSecretRef:
+      # specifies secret name within app's namespace (required)
+      name: kubeconfig-deliverable-reconciler-secret
+      # specifies key that contains kubeconfig (optional)
+      key: value
+  deploy:
+  - kapp: {}
+  fetch:
+  - git:
+      url: https://github.com/Mpluya/unicorn-run-qa-deliverable
+      ref: origin/main
+  syncPeriod: 1m0s
+  template:
+  - ytt: {}
+  - kbld: {}
