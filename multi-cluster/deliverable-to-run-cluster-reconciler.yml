@@ -4,6 +4,11 @@ metadata:
   name: deliverable-to-run-cluster-reconciler
   namespace: default
 spec:
+  fetch:
+  - git:
+      url: https://github.com/Mpluya/unicorn-run-qa-deliverable
+      ref: origin/main
+  syncPeriod: 1m0s
   cluster:
     # specifies namespace in destination cluster (optional)
     namespace: default
@@ -15,11 +20,6 @@ spec:
       key: value
   deploy:
   - kapp: {}
-  fetch:
-  - git:
-      url: https://github.com/Mpluya/unicorn-run-qa-deliverable
-      ref: origin/main
-  syncPeriod: 1m0s
   template:
   - ytt: {}
   - kbld: {}
