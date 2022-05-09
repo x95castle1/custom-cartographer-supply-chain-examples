@@ -2,7 +2,6 @@ apiVersion: kappctrl.k14s.io/v1alpha1
 kind: App
 metadata:
   name: deliverable-to-run-cluster-reconciler
-  namespace: default
 spec:
   fetch:
   - git:
@@ -19,7 +18,8 @@ spec:
       # specifies key that contains kubeconfig (optional)
       key: value
   deploy:
-  - kapp: {}
+  - kapp:
+      rawOptions: ["--dangerous-allow-empty-list-of-resources=true"]
   template:
   - ytt: {}
   - kbld: {}
