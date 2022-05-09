@@ -31,6 +31,10 @@ This is an enhancement on top of the out of the box supply chain provided with T
     kubectl replace -f source-to-url.yml --replace
     ```
 
+**The step below is OPTIONAL and should be applied in your TAP cluster where you run workload(s) (e.g. run cluster).**
+
+5. (Optional) Apply the templates (`kubectl apply -f .`) under supply-chain/rbac in your target run cluster. This leverages the default service account in the default namespace and is given ClusterRole permission to manage deliverables regardless of the namespace. This is done for convenience. You are free to configure your own service account and provide fine grained permissions following least privilege access.
+
 ## Notes:
 
 - The secret specified in App.spec.cluster.kubeconfigSecretRef holds kubeconfig info of a target run cluster. This enables 
@@ -61,4 +65,3 @@ cross-cluster communication.
     ```
     kubectl -n default create secret generic kubeconfig-deliverable-reconciler-secret --from-file=value=./kubeconfig.yml
     ```
-    
