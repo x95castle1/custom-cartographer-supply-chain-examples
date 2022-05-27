@@ -1,5 +1,7 @@
 ## Run the code-analysis use case
 
+> For non-java workloads looking to use sonar for code quality analysis, consider using the [tekton sonarqube scanner task](https://hub.tekton.dev/tekton/task/sonarqube-scanner). This [repo](https://gitlab.com/drawsmcgraw/cartographer-sonar) is an example custom supply chain to take advantage of this reusable task.
+
 ## Prerequisites
 
 1. Install flux [source-controller](https://fluxcd.io/docs/gitops-toolkit/source-watcher/#install-flux) for providing the ability to find new commits to a git
