@@ -1,0 +1,30 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterDelivery
+metadata:
+  name: delivery-basic
+spec:
+  resources:
+  - name: source-provider
+    params:
+    - name: serviceAccount
+      value: default
+    - name: gitImplementation
+      value: go-git
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: delivery-source-template
+  
+  - deployment:
+      resource: source-provider
+    name: deployer
+    params:
+    - name: serviceAccount
+      value: default
+    templateRef:
+      kind: ClusterDeploymentTemplate
+      name: app-deploy
+
+  # add tekton pipeline to run tests on staging endpoint, and if successful update ksvc via config writer
+  
+  selector:
+    app.tanzu.vmware.com/deliverable-type: web

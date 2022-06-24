@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: smoke-test-activate-task
+  labels:
+    task: smoke-test-activate-task
+spec:
+  params:
+    - name: source-url
+      default: ""
+    - name: source-revision
+      default: ""
+  steps:
+    - name: smoke-test
+      image: 

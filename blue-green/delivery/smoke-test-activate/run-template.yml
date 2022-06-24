@@ -1,11 +1,8 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterRunTemplate
 metadata:
-  name: tekton-sonar-taskrun
+  name: tekton-smoketestactivate-taskrun
 spec:
-  outputs:
-    url: spec.params[?(@.name=="source-url")].value
-    revision: spec.params[?(@.name=="source-revision")].value
   template:
     apiVersion: tekton.dev/v1beta1
     kind: TaskRun
@@ -13,9 +10,10 @@ spec:
       generateName: $(runnable.metadata.name)$-
       labels: $(runnable.metadata.labels)$
     spec:
-      params:
+      serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
+      taskRef: {name: $(selected.metadata.name)$}
+    params:
       - name: source-url
         value: $(runnable.spec.inputs.source-url)$
       - name: source-revision
         value: $(runnable.spec.inputs.source-revision)$
-      taskRef: {name: $(.metadata.name)$}
