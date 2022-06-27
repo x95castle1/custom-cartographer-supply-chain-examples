@@ -1,6 +1,6 @@
 ## Run the knative blue-green deployment use case
 
-Here's an example of a series of changes made to the stamped out knative service - to safely switch traffic to new deployment (knative revisions) using a cartographer supply chain
+Here's an example of a series of changes made to the stamped out knative service - to safely switch traffic to a new deployment (knative revisions) using a cartographer supply chain, following the blue-green deployment strategy:
 
 initial deployment:
 ```
