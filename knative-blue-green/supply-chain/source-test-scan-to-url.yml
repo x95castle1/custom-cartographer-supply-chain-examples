@@ -157,12 +157,12 @@ spec:
   - name: deployment-source-provider
     templateRef:
       kind: ClusterSourceTemplate
-      name: source-template
+      name: delivery-source-template
     params:
     - name: serviceAccount
-      value: default
+      value: #@ data.values.service_account
     - name: gitImplementation
-      value: go-git  
+      value: #@ data.values.git_implementation
 
   - name: deployment-app-config
     templateRef: 
