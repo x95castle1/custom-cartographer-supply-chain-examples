@@ -1,0 +1,165 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:overlay", "overlay")
+
+#@ if/end "config-template" not in data.values.excluded_templates:
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterConfigTemplate
+metadata:
+  name: config-template
+spec:
+  configPath: .data
+
+  healthRule:
+    alwaysHealthy: {}
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:yaml", "yaml")
+    #@ load("@ytt:json", "json")
+
+    #@ def get_claims_extension():
+    #@   claims_extension_key = "serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions"
+    #@   if not hasattr(data.values.workload.metadata, "annotations") or not hasattr(data.values.workload.metadata.annotations, claims_extension_key):
+    #@     return None
+    #@   end
+    #@
+    #@   extension = json.decode(data.values.workload.metadata.annotations[claims_extension_key])
+    #@
+    #@   spec_extension = extension.get('spec')
+    #@   if spec_extension == None:
+    #@     return None
+    #@   end
+    #@
+    #@   return spec_extension.get('serviceClaims')
+    #@ end
+
+    #@ def merge_claims_extension(claim, claims_extension):
+    #@   if claims_extension == None:
+    #@     return claim.ref
+    #@   end
+    #@   extension = claims_extension.get(claim.name)
+    #@   if extension == None:
+    #@      return claim.ref
+    #@   end
+    #@   extension.update(claim.ref)
+    #@   return extension
+    #@ end
+
+    #@ def param(key):
+    #@   if not key in data.values.params:
+    #@     return None
+    #@   end
+    #@   return data.values.params[key]
+    #@ end
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.workload.metadata, "labels"):
+    #@     labels.update(data.values.workload.metadata.labels)
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    #@ def merge_annotations(fixed_values):
+    #@   annotations = {}
+    #@   if hasattr(data.values.workload.metadata, "annotations"):
+    #@     # DEPRECATED: remove in a future release
+    #@     annotations.update(data.values.workload.metadata.annotations)
+    #@   end
+    #@   if type(param("annotations")) == "dict" or type(param("annotations")) == "struct":
+    #@     annotations.update(param("annotations"))
+    #@   end
+    #@   annotations.update(fixed_values)
+    #@   return annotations
+    #@ end
+
+    #@ def knative_revision():
+    #@   return (data.values.workload.metadata.name + "-" + data.values.source.revision.split("/")[1])[0:63]
+    #@ end
+
+    #@ def knative_spec():
+    #@   spec = data.values.config
+    #@   return (data.values.config + "-" + data.values.source.revision.split("/")[1])[0:63]
+    #@ end
+
+    #@ def delivery():
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      #! annotations NOT merged because knative annotations would be invalid here
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "run", "carto.run/workload-name": data.values.workload.metadata.name })
+    spec:
+      template: #@ knative_spec()
+        metadata:
+          name: #@ knative_revision()
+      traffic:
+        - latestRevision: true
+          percent: 0
+          tag: latest
+        - revisionName: #@ knative_revision()
+          percent: 100
+    #@ end
+
+    #@ def claims():
+    #@ claims_extension = get_claims_extension()
+    #@ for s in data.values.workload.spec.serviceClaims:
+    #@ if claims_extension == None or claims_extension.get(s.name) == None:
+    ---
+    apiVersion: servicebinding.io/v1alpha3
+    kind: ServiceBinding
+    metadata:
+      name: #@ data.values.workload.metadata.name + '-' + s.name
+      annotations: #@ merge_annotations({})
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "run", "carto.run/workload-name": data.values.workload.metadata.name })
+    spec:
+      name: #@ s.name
+      service: #@ s.ref
+      workload:
+        apiVersion: serving.knative.dev/v1
+        kind: Service
+        name: #@ data.values.workload.metadata.name
+    #@ else:
+    ---
+    apiVersion: services.apps.tanzu.vmware.com/v1alpha1
+    kind: ResourceClaim
+    metadata:
+      name: #@ data.values.workload.metadata.name + '-' + s.name
+      annotations: #@ merge_annotations({})
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "run", "carto.run/workload-name": data.values.workload.metadata.name })
+    spec:
+      ref: #@ merge_claims_extension(s, claims_extension)
+    ---
+    apiVersion: servicebinding.io/v1alpha3
+    kind: ServiceBinding
+    metadata:
+      name: #@ data.values.workload.metadata.name + '-' + s.name
+      annotations: #@ merge_annotations({})
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "run", "carto.run/workload-name": data.values.workload.metadata.name })
+    spec:
+      name: #@ s.name
+      service:
+        apiVersion: services.apps.tanzu.vmware.com/v1alpha1
+        kind: ResourceClaim
+        name: #@ data.values.workload.metadata.name + '-' + s.name
+      workload:
+        apiVersion: serving.knative.dev/v1
+        kind: Service
+        name: #@ data.values.workload.metadata.name
+    #@ end
+    #@ end
+    #@ end
+
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "config" })
+    data:
+      delivery.yml: #@ yaml.encode(delivery())
+      #@ if hasattr(data.values.workload.spec, "serviceClaims") and len(data.values.workload.spec.serviceClaims):
+      serviceclaims.yml: #@ yaml.encode(claims())
+      #@ end

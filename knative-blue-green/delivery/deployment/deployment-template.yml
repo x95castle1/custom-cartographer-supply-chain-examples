@@ -1,0 +1,92 @@
+#@ load("@ytt:data", "data")
+
+#@ if/end "app-deploy" not in data.values.excluded_templates:
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterDeploymentTemplate
+metadata:
+  name: app-deploy
+spec:
+  params:
+    - name: serviceAccount
+      default: default
+
+  healthRule:
+    singleConditionType: ReconcileSucceeded
+
+  observedCompletion:
+    succeeded:
+      key: '.status.conditions[?(@.type=="ReconcileSucceeded")].status'
+      value: 'True'
+    failed:
+      key: '.status.conditions[?(@.type=="ReconcileSucceeded")].status'
+      value: 'False'
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.deliverable.metadata, "labels"):
+    #@     labels.update(data.values.deliverable.metadata.labels)
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    apiVersion: kappctrl.k14s.io/v1alpha1
+    kind: App
+    metadata:
+      name: #@ data.values.deliverable.metadata.name
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "deploy" })
+    spec:
+      syncPeriod: 10m0s
+      serviceAccountName: #@ data.values.params.serviceAccount
+      fetch:
+        - http:
+            url: #@ data.values.deployment.url
+            #@ if/end hasattr(data.values.params, "gitops_sub_path"):
+            subPath: #@ data.values.params.gitops_sub_path
+
+        - inline:
+            paths:
+              config.yml: |
+                ---
+                apiVersion: kapp.k14s.io/v1alpha1
+                kind: Config
+                rebaseRules:
+                  - path: [metadata, annotations, serving.knative.dev/creator]
+                    type: copy
+                    sources: [new, existing]
+                    resourceMatchers: &matchers
+                      - apiVersionKindMatcher: {apiVersion: serving.knative.dev/v1, kind: Service}
+                  - path: [metadata, annotations, serving.knative.dev/lastModifier]
+                    type: copy
+                    sources: [new, existing]
+                    resourceMatchers: *matchers
+      template:
+        - ytt:
+            #@ def knative_revision():
+            #@   return (data.values.deliverable.metadata.name + "-" + data.values.source.revision.split("/")[1])[0:63]
+            #@ end
+
+            ignoreUnknownComments: true
+            inline:
+              paths:
+                add-name.yml: |
+                  #@ load("@ytt:overlay", "overlay")
+                  #@overlay/match by=overlay.subset({"apiVersion": "serving.knative.dev/v1", "kind":"Service","metadata":{"name":data.values.deliverable.metadata.name}})
+                  ---
+                  spec:
+                    template:
+                      metadata:
+                        #@overlay/match missing_ok=True
+                        name: #@ knative_revision() 
+                    #@overlay/match missing_ok=True
+                    traffic:
+                    - latestRevision: true
+                      percent: 100
+                    - revisionName: #@ knative_revision()
+                      percent: 100
+      deploy:
+        - kapp: {}
