@@ -1,0 +1,38 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterRunTemplate
+metadata:
+  name: tekton-sonarqube-taskrun
+  labels:
+    apps.tanzu.vmware.com/sonarqube: "sonarqube"
+spec:
+  outputs:
+    revision: spec.params[?(@.name=="source-revision")].value
+    url:      spec.params[?(@.name=="source-url")].value
+
+
+  template:
+    apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: $(runnable.metadata.name)$-
+      labels: $(runnable.metadata.labels)$
+    spec:
+      serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
+      params:
+      - name: source-url
+        value: $(runnable.spec.inputs.source-url)$
+      - name: source-revision
+        value: $(runnable.spec.inputs.source-revision)$
+      - name: SONAR_HOST_URL
+        value: http://a7fd13993756549ae8f575f18edc0747-1542351290.us-east-2.elb.amazonaws.com:9000
+      - name: SONAR_PROJECT_KEY
+        value: $(runnable.spec.inputs.sonar-project-key)$
+      - name: SONAR_LOGIN
+        value: ----redacted-----
+
+      taskRef:
+        name: sonarqube-scanner 
+
+      workspaces:
+        - name: tmp-workspace
+          emptyDir: {}

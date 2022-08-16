@@ -1,0 +1,192 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:assert", "assert")
+
+#@ data.values.registry.server or assert.fail("missing registry.server")
+#@ data.values.registry.repository or assert.fail("missing registry.repository")
+
+#@ def config_writer():
+#@   if data.values.gitops.commit_strategy == "pull_request":
+#@     return "config-writer-and-pull-requester-template"
+#@   end
+#@   return "config-writer-template"
+#@ end
+
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterSupplyChain
+metadata:
+  name: source-test-scan-to-url
+spec:
+  selector:
+    apps.tanzu.vmware.com/workload-type: web
+    apps.tanzu.vmware.com/has-tests: "true"
+    workload-intent: code-analysis
+    
+  params:
+    - name: maven_repository_url
+      value: #@ data.values.maven.repository.url
+    #@ if/end data.values.maven.repository.secret_name:
+    - name: maven_repository_secret_name
+      value: #@ data.values.maven.repository.secret_name
+
+    - name: gitops_branch
+      default: #@ data.values.gitops.branch
+    - name: gitops_user_name
+      default: #@ data.values.gitops.user_name
+    - name: gitops_user_email
+      default: #@ data.values.gitops.user_email
+    - name: gitops_commit_message
+      default: #@ data.values.gitops.commit_message
+    - name: gitops_ssh_secret
+      default: #@ data.values.gitops.ssh_secret
+    #@ if/end data.values.gitops.repository_prefix:
+    - name: gitops_repository_prefix
+      default: #@ data.values.gitops.repository_prefix
+    #@ if/end data.values.gitops.server_address:
+    - name: gitops_server_address
+      default: #@ data.values.gitops.server_address
+    #@ if/end data.values.gitops.repository_owner:
+    - name: gitops_repository_owner
+      default: #@ data.values.gitops.repository_owner
+    #@ if/end data.values.gitops.repository_name:
+    - name: gitops_repository_name
+      default: #@ data.values.gitops.repository_name
+    #@ if data.values.gitops.commit_strategy == "pull_request":
+    #@ if/end data.values.gitops.pull_request.server_kind:
+    - name: gitops_server_kind
+      default: #@ data.values.gitops.pull_request.server_kind
+    #@ if/end "commit_branch" in data.values.gitops.pull_request:
+    - name: gitops_commit_branch
+      default: #@ data.values.gitops.pull_request.commit_branch
+    #@ if/end data.values.gitops.pull_request.pull_request_title:
+    - name: gitops_pull_request_title
+      default: #@ data.values.gitops.pull_request.pull_request_title
+    #@ if/end data.values.gitops.pull_request.pull_request_body:
+    - name: gitops_pull_request_body
+      default: #@ data.values.gitops.pull_request.pull_request_body
+    #@ end
+
+  resources:
+  - name: source-provider
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: source-template
+    params:
+      - name: serviceAccount
+        value: #@ data.values.service_account
+      - name: gitImplementation
+        value: #@ data.values.git_implementation
+
+  - name: deliverable
+    templateRef:
+      kind: ClusterTemplate
+      name: deliverable-template
+    params:
+      - name: registry
+        value: #@ data.values.registry
+
+  - name: source-tester
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: testing-pipeline
+    sources:
+    - resource: source-provider
+      name: source
+
+  - name: source-analyzer
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: sonarqube-template
+    sources:
+    - resource: source-tester
+      name: source
+
+
+  - name: source-scanner
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: source-scanner-template
+    params:
+      - name: scanning_source_policy
+        default: #@ data.values.scanning.source.policy
+      - name: scanning_source_template
+        default: #@ data.values.scanning.source.template
+    sources:
+      - resource: source-analyzer
+        name: source
+
+  - name: image-builder
+    templateRef:
+      kind: ClusterImageTemplate
+      options:
+        - name: kpack-template
+          selector:
+            matchFields:
+              - key: spec.params[?(@.name=="dockerfile")]
+                operator: DoesNotExist
+        - name: kaniko-template
+          selector:
+            matchFields:
+              - key: spec.params[?(@.name=="dockerfile")]
+                operator: Exists
+    params:
+      - name: serviceAccount
+        value: #@ data.values.service_account
+      - name: registry
+        value: #@ data.values.registry
+      - name: clusterBuilder
+        default: #@ data.values.cluster_builder
+      - name: dockerfile
+        default: ./Dockerfile
+      - name: docker_build_context
+        default: ./
+      - name: docker_build_extra_args
+        default: []
+    sources:
+      - resource: source-scanner
+        name: source
+
+  - name: image-scanner
+    templateRef:
+      kind: ClusterImageTemplate
+      name: image-scanner-template
+    params:
+      - name: scanning_image_policy
+        default: #@ data.values.scanning.image.policy
+      - name: scanning_image_template
+        default: #@ data.values.scanning.image.template
+    images:
+      - resource: image-builder
+        name: image
+
+  - name: config-provider
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: convention-template
+    params:
+      - name: serviceAccount
+        value: #@ data.values.service_account
+    images:
+    - resource: image-scanner
+      name: image
+
+  - name: app-config
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: config-template
+    configs:
+      - resource: config-provider
+        name: config
+
+  - name: config-writer
+    templateRef:
+      kind: ClusterTemplate
+      name: #@ config_writer()
+    params:
+      - name: serviceAccount
+        value: #@ data.values.service_account
+      - name: registry
+        value: #@ data.values.registry
+    configs:
+      - resource: app-config
+        name: config
