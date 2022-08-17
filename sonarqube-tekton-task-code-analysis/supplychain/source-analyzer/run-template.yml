@@ -24,11 +24,11 @@ spec:
       - name: source-revision
         value: $(runnable.spec.inputs.source-revision)$
       - name: SONAR_HOST_URL
-        value: http://a7fd13993756549ae8f575f18edc0747-1542351290.us-east-2.elb.amazonaws.com:9000
+        value: http://sonarqube.cvsdr.tapsme.org
       - name: SONAR_PROJECT_KEY
         value: $(runnable.spec.inputs.sonar-project-key)$
       - name: SONAR_LOGIN
-        value: ----redacted-----
+        value: *****
 
       taskRef:
         name: sonarqube-scanner 
