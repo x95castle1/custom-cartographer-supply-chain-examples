@@ -6,8 +6,8 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: sonarqube-scanner
+  namespace: rehan
   labels:
-    app.kubernetes.io/version: "0.2"
     apps.tanzu.vmware.com/sonarqube: "sonarqube"
 
   annotations:
@@ -44,6 +44,16 @@ spec:
     - name: tmp-workspace
 
   steps:
+    - name: compile
+      image: gradle
+      workingDir: $(workspaces.tmp-workspace.path)
+      script: |
+        #!/usr/bin/env bash
+        # Download the code from the location created by Cartographer
+        # (Cartographer already fetched the code for us, so we don't 
+        # need to fetch it from the git repo).
+        wget -qO- $(params.source-url) | tar xvz
+        ./mvnw compile
     - name: sonar-properties-create
       image: gradle
       workingDir: $(workspaces.tmp-workspace.path)
@@ -86,11 +96,6 @@ spec:
         fi
         echo "---------------------------"
         cat $(workspaces.tmp-workspace.path)/sonar-project.properties
-
-        # Download the code from the location created by Cartographer
-        # (Cartographer already fetched the code for us, so we don't 
-        # need to fetch it from the git repo).
-        wget -qO- $(params.source-url) | tar xvz
 
     - name: sonar-scan
       image: docker.io/sonarsource/sonar-scanner-cli:4.5@sha256:b8c95a37025f3c13162118cd55761ea0b2a13d1837f9deec51b7b6d82c52040a #tag: 4.5

@@ -14,7 +14,7 @@ spec:
     apiVersion: tekton.dev/v1beta1
     kind: TaskRun
     metadata:
-      generateName: $(runnable.metadata.name)$-
+      generateName: code-analysis-$(runnable.metadata.name)$-
       labels: $(runnable.metadata.labels)$
     spec:
       serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
@@ -28,7 +28,7 @@ spec:
       - name: SONAR_PROJECT_KEY
         value: $(runnable.spec.inputs.sonar-project-key)$
       - name: SONAR_LOGIN
-        value: *****
+        value: squ_689ee47bf781dd85e7d290025fe3fd4d4ffb1c15
 
       taskRef:
         name: sonarqube-scanner 

@@ -25,7 +25,7 @@ spec:
     apiVersion: carto.run/v1alpha1
     kind: Runnable
     metadata:
-      name: #@ data.values.workload.metadata.name
+      name: #@ data.values.workload.metadata.name + "-code-analysis"
       labels: #@ merge_labels({ "app.kubernetes.io/component": "test" })
     spec:
       #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
