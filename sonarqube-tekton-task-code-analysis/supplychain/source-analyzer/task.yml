@@ -102,3 +102,54 @@ spec:
       workingDir: $(workspaces.tmp-workspace.path)
       command:
         - sonar-scanner
+    
+    - name: quality-gate
+      image: cfmanteiga/alpine-bash-curl-jq
+      workingDir: $(workspaces.tmp-workspace.path)
+      script: |
+        #!/usr/bin/env bash
+        metadataFile=$(workspaces.tmp-workspace.path)/.scannerwork/report-task.txt
+        sonarPropsFile=$(workspaces.tmp-workspace.path)/sonar-project.properties
+        if [[ ! -f "$metadataFile" ]]; then
+          echo "$metadataFile does not exist."
+          exit 1
+        fi
+
+        cat $metadataFile
+        serverUrl="$(sed -n 's/serverUrl=\(.*\)/\1/p' "${metadataFile}")"
+        ceTaskUrl="$(sed -n 's/ceTaskUrl=\(.*\)/\1/p' "${metadataFile}")"
+        sonarToken="$(sed -n 's/sonar.login=\(.*\)/\1/p' "${sonarPropsFile}")"
+
+        if [ -z "${serverUrl}" ] || [ -z "${ceTaskUrl}" ]; then
+          echo "Invalid report metadata file."
+          exit 1
+        fi
+
+        task="$(curl --silent --fail --show-error --user "${sonarToken}": "${ceTaskUrl}")"
+        status="$(jq -r '.task.status' <<< "$task")"
+
+        until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" ]]; do
+          printf '.'
+          sleep 5s
+          task="$(curl --silent --fail --show-error --user "${sonarToken}": "${ceTaskUrl}")"
+          status="$(jq -r '.task.status' <<< "$task")"
+        done
+
+        analysisId="$(jq -r '.task.analysisId' <<< "${task}")"
+        echo "analysisId: " + $analysisId
+        
+        qualityGateUrl="${serverUrl}/api/qualitygates/project_status?analysisId=${analysisId}"
+        
+        qualityGateStatus="$(curl --silent --fail --show-error --user "${sonarToken}": "${qualityGateUrl}" | jq -r '.projectStatus.status')"
+
+        if [[ ${qualityGateStatus} == "OK" ]]; then
+          echo 'quality-gate-status::PASSED'
+        elif [[ ${qualityGateStatus} == "WARN" ]]; then
+          echo 'quality-gate-status::WARN'
+        elif [[ ${qualityGateStatus} == "ERROR" ]]; then
+          echo 'quality-gate-status::FAILED'
+          exit 1
+        else
+          echo 'quality-gate-status::FAILED'
+          exit 1
+        fi

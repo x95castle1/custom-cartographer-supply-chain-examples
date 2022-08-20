@@ -51,14 +51,6 @@ spec:
         source-url: #@ data.values.source.url
         source-revision: #@ data.values.source.revision
 
-        #! Notice that the above two values start with 'data.values.source...'
-        #! while these start with 'data.values.workload....'.
-        #! That's because the above values come from the previous Source in the 
-        #! supply chain (i.e. where I can find my code)
-        #! These values below are pulled from the workload.yml (hence the 'workload').
-
-        #! Default to the svc account named 'default'. But allow users to override
-        #! via their workload.yml.
         #@ if hasattr(data.values.workload.spec, "serviceAccountName"):
         serviceAccount: #@ data.values.workload.spec.serviceAccountName
         #@ else:
