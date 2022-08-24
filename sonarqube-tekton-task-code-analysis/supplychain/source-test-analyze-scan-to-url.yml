@@ -46,7 +46,7 @@ spec:
 
   - name: source-analyzer
     params:
-    - value: "true"
+    - value: "false"
       name: wait_on_sonar_analysis
     templateRef:
       kind: ClusterSourceTemplate
