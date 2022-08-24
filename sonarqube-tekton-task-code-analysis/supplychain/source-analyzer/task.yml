@@ -39,6 +39,8 @@ spec:
     - name: source-revision
       description: i.e. git hash
       default: ""
+    - name: WAIT_ON_SONAR_ANALYSIS
+      description: toggle to wait until sonarqube analysis is complete
 
   workspaces:
     - name: tmp-workspace
@@ -108,6 +110,11 @@ spec:
       workingDir: $(workspaces.tmp-workspace.path)
       script: |
         #!/usr/bin/env bash
+        if [ -z "$(params.WAIT_ON_SONAR_ANALYSIS)" ] || [ "$(params.WAIT_ON_SONAR_ANALYSIS)" == "false" ]; then
+          echo "not waiting for analysis to finish"
+          exit 0
+        fi
+
         metadataFile=$(workspaces.tmp-workspace.path)/.scannerwork/report-task.txt
         sonarPropsFile=$(workspaces.tmp-workspace.path)/sonar-project.properties
         if [[ ! -f "$metadataFile" ]]; then
@@ -136,20 +143,20 @@ spec:
         done
 
         analysisId="$(jq -r '.task.analysisId' <<< "${task}")"
-        echo "analysisId: " + $analysisId
+        echo "analysisId: " $analysisId
         
         qualityGateUrl="${serverUrl}/api/qualitygates/project_status?analysisId=${analysisId}"
         
         qualityGateStatus="$(curl --silent --fail --show-error --user "${sonarToken}": "${qualityGateUrl}" | jq -r '.projectStatus.status')"
 
         if [[ ${qualityGateStatus} == "OK" ]]; then
-          echo 'quality-gate-status::PASSED'
+          echo "quality-gate-status::PASSED"
         elif [[ ${qualityGateStatus} == "WARN" ]]; then
-          echo 'quality-gate-status::WARN'
+          echo "quality-gate-status::WARN"
         elif [[ ${qualityGateStatus} == "ERROR" ]]; then
-          echo 'quality-gate-status::FAILED'
+          echo "quality-gate-status::FAILED"
           exit 1
         else
-          echo 'quality-gate-status::FAILED'
+          echo "quality-gate-status::FAILED"
           exit 1
         fi

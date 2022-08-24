@@ -5,8 +5,8 @@ metadata:
   name: sonarqube-template
 spec:
   params:
-    - name: serviceAccount
-      default: default
+    - name: wait_on_sonar_analysis
+      default: {}
   revisionPath: .status.outputs.revision
   urlPath: .status.outputs.url
 
@@ -42,11 +42,6 @@ spec:
         matchingLabels:
           apps.tanzu.vmware.com/sonarqube: "sonarqube"
 
-      #!
-      #! This is how we pass parameters down to our task.
-      #! The clusterRunTemplate will catch these parameters,
-      #! then pass them down to the Task.
-      #!
       inputs:
         source-url: #@ data.values.source.url
         source-revision: #@ data.values.source.revision
@@ -58,3 +53,4 @@ spec:
         #@ end
 
         sonar-project-key: #@ data.values.workload.metadata.name
+        wait_on_sonar_analysis: #@ data.values.params.wait_on_sonar_analysis

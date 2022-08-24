@@ -29,6 +29,8 @@ spec:
         value: $(runnable.spec.inputs.sonar-project-key)$
       - name: SONAR_LOGIN
         value: squ_689ee47bf781dd85e7d290025fe3fd4d4ffb1c15
+      - name: WAIT_ON_SONAR_ANALYSIS
+        value: $(runnable.spec.inputs.wait_on_sonar_analysis)$
 
       taskRef:
         name: sonarqube-scanner 

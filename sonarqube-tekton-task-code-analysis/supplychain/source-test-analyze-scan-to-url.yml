@@ -45,6 +45,9 @@ spec:
       name: testing-pipeline
 
   - name: source-analyzer
+    params:
+    - value: "true"
+      name: wait_on_sonar_analysis
     templateRef:
       kind: ClusterSourceTemplate
       name: sonarqube-template
