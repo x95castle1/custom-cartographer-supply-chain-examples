@@ -36,5 +36,9 @@ spec:
         name: sonarqube-scanner 
 
       workspaces:
-        - name: tmp-workspace
+        - name: maven-settings
+          subPath: maven-repo-cache
+          persistentVolumeClaim:
+            claimName: supplychain-pvc
+        - name: supplychain-workspace
           emptyDir: {}

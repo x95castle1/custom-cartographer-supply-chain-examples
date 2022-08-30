@@ -1,14 +1,17 @@
+#@ load("@ytt:data", "data")
+
+#@ if/end "testing-pipeline" not in data.values.excluded_templates:
+---
 apiVersion: carto.run/v1alpha1
 kind: ClusterSourceTemplate
 metadata:
-  annotations:
-  name: sonarqube-template
+  name: testing-pipeline
 spec:
-  params:
-    - name: wait_on_sonar_analysis
-      default: {}
-  revisionPath: .status.outputs.revision
   urlPath: .status.outputs.url
+  revisionPath: .status.outputs.revision
+
+  healthRule:
+    singleConditionType: Ready
 
   ytt: |
     #@ load("@ytt:data", "data")
@@ -22,36 +25,27 @@ spec:
     #@   return labels
     #@ end
 
+    ---
     apiVersion: carto.run/v1alpha1
     kind: Runnable
     metadata:
-      name: #@ data.values.workload.metadata.name + "-code-analysis"
+      name: #@ data.values.workload.metadata.name
       labels: #@ merge_labels({ "app.kubernetes.io/component": "test" })
     spec:
       #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
       serviceAccountName: #@ data.values.workload.spec.serviceAccountName
 
       runTemplateRef:
-        name: tekton-sonarqube-taskrun
+        name: tekton-source-pipelinerun
         kind: ClusterRunTemplate
 
       selector:
         resource:
           apiVersion: tekton.dev/v1beta1
-          kind: Task
+          kind: Pipeline
         matchingLabels:
-          apps.tanzu.vmware.com/sonarqube: "sonarqube"
+          apps.tanzu.vmware.com/pipeline: test
           apps.tanzu.vmware.com/language: #@ data.values.workload.metadata.labels["apps.tanzu.vmware.com/language"]
-          
       inputs:
         source-url: #@ data.values.source.url
         source-revision: #@ data.values.source.revision
-
-        #@ if hasattr(data.values.workload.spec, "serviceAccountName"):
-        serviceAccount: #@ data.values.workload.spec.serviceAccountName
-        #@ else:
-        serviceAccount: default
-        #@ end
-
-        sonar-project-key: #@ data.values.workload.metadata.name
-        wait_on_sonar_analysis: #@ data.values.params.wait_on_sonar_analysis
