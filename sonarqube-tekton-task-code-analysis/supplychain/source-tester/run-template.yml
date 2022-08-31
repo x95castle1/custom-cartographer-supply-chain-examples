@@ -21,7 +21,7 @@ spec:
         - name: maven-settings
           subPath: maven-repo-cache
           persistentVolumeClaim:
-            claimName: supplychain-pvc
+            claimName: supplychainpvc
         - name: supplychain-workspace
           emptyDir: {}
       pipelineRef:

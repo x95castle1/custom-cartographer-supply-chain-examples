@@ -4,8 +4,8 @@ metadata:
   name: sonarqube-scanner
   namespace: rehan
   labels:
-    apps.tanzu.vmware.com/sonarqube: "sonarqube"
     apps.tanzu.vmware.com/language: "java"
+    apps.tanzu.vmware.com/sonarqube: "sonarqube"
   annotations:
     tekton.dev/pipelines.minVersion: "0.12.1"
     tekton.dev/categories: Security
@@ -37,7 +37,7 @@ spec:
 
   steps:
     - name: compile
-      image: tapsme/gradle:latest
+      image: index.docker.io/tapsme/gradle@sha256:ba5d54bc93e3d7ae95481963c4cbd171100804a4fc64baf2ebabf0329c9e1179
       workingDir: $(workspaces.supplychain-workspace.path)
       script: |
         #!/usr/bin/env bash
@@ -45,7 +45,7 @@ spec:
         wget -qO- $(params.source-url) | tar xvz
         ./mvnw compile -Dmaven.repo.local=$(workspaces.maven-settings.path)
     - name: sonar-properties-create
-      image: tapsme/gradle:latest
+      image: index.docker.io/tapsme/gradle@sha256:ba5d54bc93e3d7ae95481963c4cbd171100804a4fc64baf2ebabf0329c9e1179
       workingDir: $(workspaces.supplychain-workspace.path)
       script: |
         #!/usr/bin/env bash
@@ -91,13 +91,13 @@ spec:
         cat $(workspaces.supplychain-workspace.path)/sonar-project.properties
 
     - name: sonar-scan
-      image: tapsme/sonar-scanner-cli:latest
+      image: index.docker.io/tapsme/sonar-scanner-cli@sha256:b8c95a37025f3c13162118cd55761ea0b2a13d1837f9deec51b7b6d82c52040a
       workingDir: $(workspaces.supplychain-workspace.path)
       command:
         - sonar-scanner
     
     - name: quality-gate
-      image: tapsme/alpine-bash-curl-jq
+      image: index.docker.io/tapsme/alpine-bash-curl-jq@sha256:a5369f1e4e9d139ed6a4064686cd0ff57a75f8d1e928944c540fe753c332acfd
       workingDir: $(workspaces.supplychain-workspace.path)
       script: |
         #!/usr/bin/env bash

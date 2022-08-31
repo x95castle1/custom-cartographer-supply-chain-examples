@@ -33,12 +33,12 @@ spec:
         value: $(runnable.spec.inputs.wait_on_sonar_analysis)$
 
       taskRef:
-        name: sonarqube-scanner 
+        name: $(selected.metadata.name)$
 
       workspaces:
         - name: maven-settings
           subPath: maven-repo-cache
           persistentVolumeClaim:
-            claimName: supplychain-pvc
+            claimName: supplychainpvc
         - name: supplychain-workspace
           emptyDir: {}
