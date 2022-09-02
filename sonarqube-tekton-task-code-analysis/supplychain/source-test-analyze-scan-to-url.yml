@@ -37,6 +37,15 @@ spec:
       kind: ClusterTemplate
       name: deliverable-template
 
+  - name: source-tester
+    sources:
+    - name: source
+      resource: source-provider
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: testing-pipeline
+
+
   - name: source-analyzer
     params:
     - value: "false"
@@ -45,16 +54,8 @@ spec:
       kind: ClusterSourceTemplate
       name: sonarqube-template
     sources:
-    - resource: source-provider
+    - resource: source-tester
       name: source
-
-  - name: source-tester
-    sources:
-    - name: source
-      resource: source-analyzer
-    templateRef:
-      kind: ClusterSourceTemplate
-      name: testing-pipeline
 
 
   - name: source-scanner
@@ -65,7 +66,7 @@ spec:
       name: scanning_source_template
     sources:
     - name: source
-      resource: source-tester
+      resource: source-analyzer
     templateRef:
       kind: ClusterSourceTemplate
       name: source-scanner-template

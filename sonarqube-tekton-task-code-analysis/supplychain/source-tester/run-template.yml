@@ -18,6 +18,9 @@ spec:
       labels: $(runnable.metadata.labels)$
     spec:
       workspaces:
+        - name: custom-maven-settings
+          secret:
+            secretName: maven-settings
         - name: maven-settings
           subPath: maven-repo-cache
           persistentVolumeClaim:

@@ -32,6 +32,7 @@ spec:
       description: toggle to wait until sonarqube analysis is complete
 
   workspaces:
+    - name: custom-maven-settings
     - name: maven-settings
     - name: supplychain-workspace
 
@@ -43,7 +44,7 @@ spec:
         #!/usr/bin/env bash
         set -ex
         wget -qO- $(params.source-url) | tar xvz
-        ./mvnw compile -Dmaven.repo.local=$(workspaces.maven-settings.path)
+        ./mvnw compile -Dmaven.repo.local=$(workspaces.maven-settings.path) -s $(workspaces.custom-maven-settings.path)/settings.xml
     - name: sonar-properties-create
       image: index.docker.io/tapsme/gradle@sha256:ba5d54bc93e3d7ae95481963c4cbd171100804a4fc64baf2ebabf0329c9e1179
       workingDir: $(workspaces.supplychain-workspace.path)

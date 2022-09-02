@@ -36,6 +36,9 @@ spec:
         name: $(selected.metadata.name)$
 
       workspaces:
+        - name: custom-maven-settings
+          secret:
+            secretName: maven-settings
         - name: maven-settings
           subPath: maven-repo-cache
           persistentVolumeClaim:
