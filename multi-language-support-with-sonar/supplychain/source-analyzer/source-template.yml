@@ -1,0 +1,57 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSourceTemplate
+metadata:
+  annotations:
+  name: sonarqube-template
+spec:
+  params:
+    - name: wait_on_sonar_analysis
+      default: {}
+  revisionPath: .status.outputs.revision
+  urlPath: .status.outputs.url
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.workload.metadata, "labels"):
+    #@     labels.update(data.values.workload.metadata.labels)
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    apiVersion: carto.run/v1alpha1
+    kind: Runnable
+    metadata:
+      name: #@ data.values.workload.metadata.name + "-code-analysis"
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "test" })
+    spec:
+      #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+
+      runTemplateRef:
+        name: tekton-sonarqube-taskrun
+        kind: ClusterRunTemplate
+
+      selector:
+        resource:
+          apiVersion: tekton.dev/v1beta1
+          kind: Task
+        matchingLabels:
+          apps.tanzu.vmware.com/sonarqube: "sonarqube"
+          apps.tanzu.vmware.com/language: #@ data.values.workload.metadata.labels["apps.tanzu.vmware.com/language"]
+          
+      inputs:
+        source-url: #@ data.values.source.url
+        source-revision: #@ data.values.source.revision
+
+        #@ if hasattr(data.values.workload.spec, "serviceAccountName"):
+        serviceAccount: #@ data.values.workload.spec.serviceAccountName
+        #@ else:
+        serviceAccount: default
+        #@ end
+
+        sonar-project-key: #@ data.values.workload.metadata.name
+        wait_on_sonar_analysis: #@ data.values.params.wait_on_sonar_analysis

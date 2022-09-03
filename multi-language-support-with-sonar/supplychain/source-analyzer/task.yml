@@ -1,0 +1,154 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: sonarqube-scanner
+  namespace: default
+  labels:
+    apps.tanzu.vmware.com/language: "java"
+    apps.tanzu.vmware.com/sonarqube: "sonarqube"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Security
+    tekton.dev/tags: security
+    tekton.dev/displayName: "sonarqube scanner"
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  params:
+    - name: SONAR_HOST_URL
+      description: Host URL where the sonarqube server is running
+      default: ""
+    - name: SONAR_PROJECT_KEY
+      description: Project's unique key
+      default: ""
+    - name: SONAR_LOGIN
+      description: Auth for the project
+      default: ""
+    - name: source-url
+      description: Location of the source code
+    - name: source-revision
+      description: i.e. git hash
+      default: ""
+    - name: WAIT_ON_SONAR_ANALYSIS
+      description: toggle to wait until sonarqube analysis is complete
+
+  workspaces:
+    - name: custom-maven-settings
+    - name: maven-settings
+    - name: supplychain-workspace
+
+  steps:
+    - name: compile
+      image: index.docker.io/tapsme/gradle@sha256:ba5d54bc93e3d7ae95481963c4cbd171100804a4fc64baf2ebabf0329c9e1179
+      workingDir: $(workspaces.supplychain-workspace.path)
+      script: |
+        #!/usr/bin/env bash
+        set -ex
+        wget -qO- $(params.source-url) | tar xvz
+        ./mvnw compile -Dmaven.repo.local=$(workspaces.maven-settings.path) -s $(workspaces.custom-maven-settings.path)/settings.xml
+    - name: sonar-properties-create
+      image: index.docker.io/tapsme/gradle@sha256:ba5d54bc93e3d7ae95481963c4cbd171100804a4fc64baf2ebabf0329c9e1179
+      workingDir: $(workspaces.supplychain-workspace.path)
+      script: |
+        #!/usr/bin/env bash
+        replaceValues() {
+          filename=$1
+          thekey=$2
+          newvalue=$3
+          if ! grep -R "^[#]*\s*${thekey}=.*" $filename >/dev/null; then
+            echo "APPENDING because '${thekey}' not found"
+            echo "" >>$filename
+            echo "$thekey=$newvalue" >>$filename
+          else
+            echo "SETTING because '${thekey}' found already"
+            sed -ir "s|^[#]*\s*${thekey}=.*|$thekey=$newvalue|" $filename
+          fi
+        }
+
+        # If we were given a properties file, then use that.
+        if [[ -f $(workspaces.supplychain-workspace.path)/sonar-project.properties ]]; then
+          echo "using user provided sonar-project.properties file"
+          cp -RL $(workspaces.supplychain-workspace.path)/sonar-project.properties $(workspaces.supplychain-workspace.path)/sonar-project.properties
+        fi
+        if [[ -f $(workspaces.supplychain-workspace.path)/sonar-project.properties ]]; then
+
+          # Allow overrides from parameters passed in from the supply chain.
+          if [[ -n "$(params.SONAR_HOST_URL)" ]]; then
+            replaceValues $(workspaces.supplychain-workspace.path)/sonar-project.properties sonar.host.url $(params.SONAR_HOST_URL)
+          fi
+          if [[ -n "$(params.SONAR_PROJECT_KEY)" ]]; then
+            replaceValues $(workspaces.supplychain-workspace.path)/sonar-project.properties sonar.projectKey $(params.SONAR_PROJECT_KEY)
+          fi
+          if [[ -n "$(params.SONAR_LOGIN)" ]]; then
+            replaceValues $(workspaces.supplychain-workspace.path)/sonar-project.properties sonar.login $(params.SONAR_LOGIN)
+          fi
+        else
+          touch sonar-project.properties
+          echo "sonar.projectKey=$(params.SONAR_PROJECT_KEY)" >> sonar-project.properties
+          echo "sonar.host.url=$(params.SONAR_HOST_URL)" >> sonar-project.properties
+          echo "sonar.login=$(params.SONAR_LOGIN)" >> sonar-project.properties
+          echo "sonar.sources=." >> sonar-project.properties
+        fi
+        echo "---------------------------"
+        cat $(workspaces.supplychain-workspace.path)/sonar-project.properties
+
+    - name: sonar-scan
+      image: index.docker.io/tapsme/sonar-scanner-cli@sha256:b8c95a37025f3c13162118cd55761ea0b2a13d1837f9deec51b7b6d82c52040a
+      workingDir: $(workspaces.supplychain-workspace.path)
+      command:
+        - sonar-scanner
+    
+    - name: quality-gate
+      image: index.docker.io/tapsme/alpine-bash-curl-jq@sha256:a5369f1e4e9d139ed6a4064686cd0ff57a75f8d1e928944c540fe753c332acfd
+      workingDir: $(workspaces.supplychain-workspace.path)
+      script: |
+        #!/usr/bin/env bash
+        if [ -z "$(params.WAIT_ON_SONAR_ANALYSIS)" ] || [ "$(params.WAIT_ON_SONAR_ANALYSIS)" == "false" ]; then
+          echo "not waiting for analysis to finish"
+          exit 0
+        fi
+
+        metadataFile=$(workspaces.supplychain-workspace.path)/.scannerwork/report-task.txt
+        sonarPropsFile=$(workspaces.supplychain-workspace.path)/sonar-project.properties
+        if [[ ! -f "$metadataFile" ]]; then
+          echo "$metadataFile does not exist."
+          exit 1
+        fi
+
+        cat $metadataFile
+        serverUrl="$(sed -n 's/serverUrl=\(.*\)/\1/p' "${metadataFile}")"
+        ceTaskUrl="$(sed -n 's/ceTaskUrl=\(.*\)/\1/p' "${metadataFile}")"
+        sonarToken="$(sed -n 's/sonar.login=\(.*\)/\1/p' "${sonarPropsFile}")"
+
+        if [ -z "${serverUrl}" ] || [ -z "${ceTaskUrl}" ]; then
+          echo "Invalid report metadata file."
+          exit 1
+        fi
+
+        task="$(curl --silent --fail --show-error --user "${sonarToken}": "${ceTaskUrl}")"
+        status="$(jq -r '.task.status' <<< "$task")"
+
+        until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" ]]; do
+          printf '.'
+          sleep 5s
+          task="$(curl --silent --fail --show-error --user "${sonarToken}": "${ceTaskUrl}")"
+          status="$(jq -r '.task.status' <<< "$task")"
+        done
+
+        analysisId="$(jq -r '.task.analysisId' <<< "${task}")"
+        echo "analysisId: " $analysisId
+        
+        qualityGateUrl="${serverUrl}/api/qualitygates/project_status?analysisId=${analysisId}"
+        
+        qualityGateStatus="$(curl --silent --fail --show-error --user "${sonarToken}": "${qualityGateUrl}" | jq -r '.projectStatus.status')"
+
+        if [[ ${qualityGateStatus} == "OK" ]]; then
+          echo "quality-gate-status::PASSED"
+        elif [[ ${qualityGateStatus} == "WARN" ]]; then
+          echo "quality-gate-status::WARN"
+        elif [[ ${qualityGateStatus} == "ERROR" ]]; then
+          echo "quality-gate-status::FAILED"
+          exit 1
+        else
+          echo "quality-gate-status::FAILED"
+          exit 1
+        fi
