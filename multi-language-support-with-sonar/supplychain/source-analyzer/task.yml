@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: sonarqube-scanner
-  namespace: rehan
+  namespace: default
   labels:
     apps.tanzu.vmware.com/language: "java"
     apps.tanzu.vmware.com/sonarqube: "sonarqube"

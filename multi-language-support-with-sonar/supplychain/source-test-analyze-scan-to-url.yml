@@ -146,7 +146,7 @@ spec:
         server: index.docker.io
     templateRef:
       kind: ClusterTemplate
-      name: config-writer-template
+      name: config-writer-and-pull-requester-template
   selector:
     apps.tanzu.vmware.com/has-tests: "true"
     apps.tanzu.vmware.com/workload-type: web
