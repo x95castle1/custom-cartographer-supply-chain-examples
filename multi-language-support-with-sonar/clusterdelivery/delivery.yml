@@ -20,9 +20,9 @@ spec:
       name: delivery-source-template
     params:
     - name: serviceAccount
-      value: #@ data.values.service_account
+      value: default
     - name: gitImplementation
-      value: #@ data.values.git_implementation
+      value: go-git
 
   - name: deployer
     templateRef:
@@ -30,7 +30,7 @@ spec:
       name: app-deploy
     params:
       - name: serviceAccount
-        value: #@ data.values.service_account
+        value: default
     deployment:
       resource: source-provider
 
