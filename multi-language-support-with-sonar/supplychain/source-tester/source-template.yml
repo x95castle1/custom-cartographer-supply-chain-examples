@@ -15,6 +15,7 @@ spec:
 
   ytt: |
     #@ load("@ytt:data", "data")
+    #@ load("@ytt:assert", "assert")
 
     #@ def merge_labels(fixed_values):
     #@   labels = {}
@@ -45,7 +46,7 @@ spec:
           kind: Pipeline
         matchingLabels:
           apps.tanzu.vmware.com/pipeline: test
-          apps.tanzu.vmware.com/language: #@ data.values.workload.metadata.labels["apps.tanzu.vmware.com/language"]
+          apps.tanzu.vmware.com/language: #@ data.values.workload.metadata.labels["apps.tanzu.vmware.com/language"] or assert.fail("please add a language label on your workload, e.g. apps.tanzu.vmware.com/language: java")
       inputs:
         source-url: #@ data.values.source.url
         source-revision: #@ data.values.source.revision

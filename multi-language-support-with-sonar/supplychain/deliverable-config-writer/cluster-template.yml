@@ -1,0 +1,55 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterTemplate
+metadata:
+  labels:
+  name: config-writer-deliverable-template
+spec:
+  params:
+  - default: default
+    name: serviceAccount
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:json", "json")
+    #@ load("@ytt:base64", "base64")
+
+    #@ def param(key):
+    #@   if not key in data.values.params:
+    #@     return None
+    #@   end
+    #@   return data.values.params[key]
+    #@ end
+
+    ---
+    apiVersion: carto.run/v1alpha1
+    kind: Runnable
+    metadata:
+      name: #@ data.values.workload.metadata.name + "-deliverable-config-writer"
+      labels:
+        app.kubernetes.io/component: config-writer
+        #@ if/end hasattr(data.values.workload.metadata, "labels") and hasattr(data.values.workload.metadata.labels, "app.kubernetes.io/part-of"):
+        app.kubernetes.io/part-of: #@ data.values.workload.metadata.labels["app.kubernetes.io/part-of"]
+    spec:
+      #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
+      serviceAccountName: #@ data.values.workload.spec.serviceAccountName
+
+      runTemplateRef:
+        name: tekton-taskrun
+
+      inputs:
+        serviceAccount: #@ data.values.params.serviceAccount
+        taskRef:
+          kind: ClusterTask
+          name: #@ "git-writer"
+        params:
+          - name: git_repository
+            value: #@ param("deliverable_repository")
+          - name: git_branch
+            value: #@ param("deliverable_branch")
+          - name: git_user_name
+            value: #@ param("gitops_user_name")
+          - name: git_user_email
+            value: #@ param("gitops_user_email")
+          - name: git_commit_message
+            value: #@ param("gitops_commit_message")
+          - name: git_files
+            value: #@ base64.encode(json.encode(data.values.config))
