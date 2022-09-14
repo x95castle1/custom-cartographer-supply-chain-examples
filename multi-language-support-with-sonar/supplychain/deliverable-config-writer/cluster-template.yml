@@ -19,7 +19,6 @@ spec:
     #@   return data.values.params[key]
     #@ end
 
-
     ---
     apiVersion: carto.run/v1alpha1
     kind: Runnable
