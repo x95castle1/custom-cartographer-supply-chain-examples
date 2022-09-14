@@ -1,0 +1,183 @@
+#@ load("@ytt:data", "data")
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: commit-and-pr
+spec:
+  description: |-
+    A task that writes a given set of files (provided as a json base64-encoded)
+    to a git repository under a specified path. A pull request is then opened
+    to merge the changes into the specified base branch.
+  params:
+    - name: repository_owner
+      description: The owner of the repository, either an organisation or username
+      type: string
+    - name: repository_name
+      description: The name of the repository
+      type: string
+    - name: commit_branch
+      type: string
+      description: The name of the branch where desired changes are implemented
+    - name: git_user_email
+      description: User email address
+      type: string
+      default: "example@example.com"
+    - name: git_user_name
+      description: User name
+      type: string
+      default: "Example"
+    - name: git_commit_message
+      description: Message for the git commit
+      type: string
+      default: "New Commit"
+    - name: git_files
+      type: string
+      description: >
+        Base64-encoded json map of files to write to registry, for example -
+        eyAiUkVBRE1FLm1kIjogIiMgUmVhZG1lIiB9
+    - name: git_server_address
+      type: string
+      description: The git server location
+      default: https://github.com
+    - name: git_server_kind
+      type: string
+      description: The git server kind (e.g. github, gitlab, gitea, etc)
+      default: github
+    - name: pull_request_title
+      type: string
+      description: The title of the pull request
+    - name: pull_request_body
+      type: string
+      description: The message body of the pull request
+      default: ""
+    - name: base_branch
+      type: string
+      description: The name of the branch the desired changes should be pulled in to
+      default: main
+    - name: sub_path
+      description: Sub directory in which to write
+      type: string
+      default: "config"
+  results:
+    - name: pr-url
+      description: The url of the successfully created pull request
+  workspaces:
+    - name: ws
+      mountPath: /workspaces/ws
+  steps:
+    - name: git-clone-and-push
+      image: northamerica-northeast2-docker.pkg.dev/kontinue/catalog/config-writer
+      securityContext:
+        runAsUser: 0
+      workingDir: /root
+      script: |
+        #!/usr/bin/env bash
+
+        set -o errexit
+
+        commit_branch="$(params.commit_branch)"
+        if [ -z "$commit_branch" ]; then
+          commit_branch=$(date +%s | base64)
+        fi
+
+        set +o xtrace # Avoid leaking secrets, echo sensitive lines
+
+        echo 'git_prefix=$(cat $(credentials.path)/.git-credentials)'
+        git_prefix=$(cat $(credentials.path)/.git-credentials)
+
+        echo 'git_repository="$git_prefix/$(params.repository_owner)/$(params.repository_name).git"'
+        git_repository="$git_prefix/$(params.repository_owner)/$(params.repository_name).git"
+
+        echo 'git clone --depth 1 -b "$commit_branch" "$git_repository" ./repo 2>&1 | sed "s|$git_prefix|REDACTED|g'
+        git clone --depth 1 -b "$commit_branch" "$git_repository" ./repo 2>&1 | sed "s|$git_prefix|REDACTED|g"
+        echo 'if [ ${PIPESTATUS[0]} -ne 0 ]; then'
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          set -o xtrace
+          cd ./repo
+        else
+          echo 'git clone --depth 1 "$git_repository" ./repo 2>&1 | sed "s|$git_prefix|REDACTED|g"'
+          git clone --depth 1 "$git_repository" ./repo 2>&1 | sed "s|$git_prefix|REDACTED|g"
+          set -o xtrace
+          cd ./repo
+          git checkout -b "$commit_branch"
+        fi
+
+        git config user.email "$(params.git_user_email)"
+        git config user.name "$(params.git_user_name)"
+
+        mkdir -p $(params.sub_path) && rm -rf $(params.sub_path)/*
+        cd $(params.sub_path)
+
+        echo '$(params.git_files)' | base64 --decode > files.json
+        eval "$(cat files.json | jq -r 'to_entries | .[] | @sh "mkdir -p $(dirname \(.key)) && echo \(.value) > \(.key) && git add \(.key)"')"
+
+        git commit -m "$(params.git_commit_message)"
+        git push origin $commit_branch
+
+        echo "$commit_branch" > /workspaces/ws/commit_branch
+
+    - name: ensure-base-branch-exists
+      image: northamerica-northeast2-docker.pkg.dev/kontinue/catalog/config-writer
+      securityContext:
+        runAsUser: 0
+      workingDir: /root
+      script: |
+        #!/usr/bin/env bash
+
+        set -o errexit
+        set -o pipefail
+
+        set +o xtrace # Avoid leaking secrets, echo sensitive lines
+
+        echo 'git_prefix=$(cat $(credentials.path)/.git-credentials)'
+        git_prefix=$(cat $(credentials.path)/.git-credentials)
+
+        echo 'git_repository="$git_prefix/$(params.repository_owner)/$(params.repository_name).git"'
+        git_repository="$git_prefix/$(params.repository_owner)/$(params.repository_name).git"
+
+        echo 'git clone --depth 1 -b "$commit_branch" "$git_repository" ./repo 2>&1 | sed "s|$git_prefix|REDACTED|g'
+        git clone --depth 1 "$git_repository" ./repo 2>&1 | sed "s|$git_prefix|REDACTED|g"
+
+        set -o xtrace
+        cd ./repo
+
+        if git show-ref --verify --quiet "refs/heads/$(params.base_branch)"; then
+          echo "branch exists"
+        else
+          git checkout --orphan "$(params.base_branch)"
+          git rm --cached . -r || true
+          git config user.email "$(params.git_user_email)"
+          git config user.name "$(params.git_user_name)"
+          git commit -m "Initialize branch" --allow-empty
+          git push origin $(params.base_branch)
+        fi
+
+    - name: open-pr
+      image: ghcr.io/jenkins-x/jx-scm
+      script: |
+        #!/usr/bin/env bash
+
+        set -o errexit
+        set -o pipefail
+
+        head_branch=$(cat /workspaces/ws/commit_branch | tr -d '\n')
+
+        token=$(cat $(credentials.path)/.git-credentials | sed -e 's/https:.*://' | sed -e 's/@.*//')
+
+        jx-scm pull-request create \
+          --kind "$(params.git_server_kind)" \
+          --server "$(params.git_server_address)" \
+          --username "$(params.git_user_name)" \
+          --token "$token" \
+          --owner "$(params.repository_owner)" \
+          --name "$(params.repository_name)" \
+          --head "$head_branch" \
+          --title "$(params.pull_request_title)" \
+          --body "$(params.pull_request_body)" \
+          --base "$(params.base_branch)" \
+          --allow-update 2>&1 |
+        tee stdoutAndSterr.txt
+
+        cat stdoutAndSterr.txt | sed -n -e 's/^.*\. url: //p' > $(results.pr-url.path)

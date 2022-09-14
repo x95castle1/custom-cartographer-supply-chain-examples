@@ -1,0 +1,52 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterDelivery
+metadata:
+  name: delivery-basic
+spec:
+  params:
+  - name: deliverable_repository_owner
+    default: Mpluya
+  - name: deliverable_repository_name
+    default: config-deliverable-prod
+  selector:
+    app.tanzu.vmware.com/deliverable-type: web
+
+  resources:
+  - name: source-provider
+    templateRef:
+      kind: ClusterSourceTemplate
+      name: delivery-source-template
+    params:
+    - name: serviceAccount
+      value: #@ data.values.service_account
+    - name: gitImplementation
+      value: #@ data.values.git_implementation
+
+  - name: deployer
+    templateRef:
+      kind: ClusterDeploymentTemplate
+      name: app-deploy
+    params:
+      - name: serviceAccount
+        value: #@ data.values.service_account
+    deployment:
+      resource: source-provider
+
+  - configs:
+    name: prod-deliverable-config
+    templateRef:
+      kind: ClusterConfigTemplate
+      name: config-deliverable-template
+
+  - name: prod-deliverable-config-writer-and-pr
+    configs:
+    - name: config
+      resource: prod-deliverable-config 
+    params:
+    - name: serviceAccount
+      value: default
+    templateRef:
+      kind: ClusterTemplate
+      name: deliverable-config-writer-and-pr-template
