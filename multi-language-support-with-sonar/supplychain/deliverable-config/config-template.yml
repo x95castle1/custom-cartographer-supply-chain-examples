@@ -63,7 +63,7 @@ spec:
     metadata:
       name: #@ data.values.workload.metadata.name
       namespace: #@ data.values.workload.metadata.namespace
-      labels: #@ merge_labels({ "app.kubernetes.io/component": "deliverable", "app.tanzu.vmware.com/deliverable-type": "web" })
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "deliverable", "app.tanzu.vmware.com/deliverable-type": "web", "deliverable-intent": "code-promotion" })
     spec:
       #@ if/end hasattr(data.values.workload.spec, "serviceAccountName"):
       serviceAccountName: #@ data.values.workload.spec.serviceAccountName
