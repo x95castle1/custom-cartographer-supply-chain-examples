@@ -4,7 +4,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterRunTemplate
 metadata:
-  name: commit-and-pr-pipelinerun
+  name: commit-and-pr-pipelinerun-prod
 spec:
   outputs:
     pr-url: status.taskResults[?(@.name=="pr-url")].value

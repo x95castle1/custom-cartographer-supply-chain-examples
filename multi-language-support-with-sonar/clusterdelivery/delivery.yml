@@ -3,7 +3,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterDelivery
 metadata:
-  name: delivery-basic
+  name: delivery-with-code-promotion
 spec:
   params:
   - name: deliverable_repository_owner
