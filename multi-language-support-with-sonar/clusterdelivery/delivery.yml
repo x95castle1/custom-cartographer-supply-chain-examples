@@ -12,7 +12,7 @@ spec:
     default: config-deliverable-prod
   selector:
     app.tanzu.vmware.com/deliverable-type: web
-
+    deliverable-intent: code-promotion
   resources:
   - name: source-provider
     templateRef:
