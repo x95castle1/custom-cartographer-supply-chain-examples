@@ -1,2 +1,2 @@
 
-`kapp deploy -a sonarqube-supplychain-and-templates -f sonarqube-tekton-task-code-analysis`
+`kapp deploy -a multi-language-support-with-sonar -f multi-language-support-with-sonar`
