@@ -3,7 +3,7 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterDelivery
 metadata:
-  name: delivery-basic
+  name: delivery-with-code-promotion
 spec:
   params:
   - name: deliverable_repository_owner
@@ -12,7 +12,7 @@ spec:
     default: config-deliverable-prod
   selector:
     app.tanzu.vmware.com/deliverable-type: web
-
+    deliverable-intent: code-promotion
   resources:
   - name: source-provider
     templateRef:
@@ -20,9 +20,9 @@ spec:
       name: delivery-source-template
     params:
     - name: serviceAccount
-      value: #@ data.values.service_account
+      value: default
     - name: gitImplementation
-      value: #@ data.values.git_implementation
+      value: go-git
 
   - name: deployer
     templateRef:
@@ -30,7 +30,7 @@ spec:
       name: app-deploy
     params:
       - name: serviceAccount
-        value: #@ data.values.service_account
+        value: default
     deployment:
       resource: source-provider
 
