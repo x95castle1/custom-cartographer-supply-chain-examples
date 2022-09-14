@@ -1,0 +1,51 @@
+#@ load("@ytt:data", "data")
+
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterRunTemplate
+metadata:
+  name: commit-and-pr-pipelinerun
+spec:
+  outputs:
+    pr-url: status.taskResults[?(@.name=="pr-url")].value
+  template:
+    apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: $(runnable.metadata.name)$-commit-and-pr-
+      labels: $(runnable.metadata.labels)$
+    spec:
+      serviceAccountName: $(runnable.spec.inputs.serviceAccount)$
+      taskRef:
+        name: commit-and-pr
+        kind: ClusterTask
+      workspaces:
+        - name: ws
+          emptyDir: { }
+      params:
+        - name: git_server_kind
+          value: $(runnable.spec.inputs.git_server_kind)$
+        - name: git_server_address
+          value: $(runnable.spec.inputs.git_server_address)$
+        - name: repository_owner
+          value: $(runnable.spec.inputs.repository_owner)$
+        - name: repository_name
+          value: $(runnable.spec.inputs.repository_name)$
+        - name: commit_branch
+          value: $(runnable.spec.inputs.commit_branch)$
+        - name: pull_request_title
+          value: $(runnable.spec.inputs.pull_request_title)$
+        - name: pull_request_body
+          value: $(runnable.spec.inputs.pull_request_body)$
+        - name: base_branch
+          value: $(runnable.spec.inputs.base_branch)$
+        - name: git_user_name
+          value: $(runnable.spec.inputs.git_user_name)$
+        - name: git_user_email
+          value: $(runnable.spec.inputs.git_user_email)$
+        - name: git_commit_message
+          value: $(runnable.spec.inputs.git_commit_message)$
+        - name: git_files
+          value: $(runnable.spec.inputs.git_files)$
+        - name: sub_path
+          value: $(runnable.spec.inputs.sub_path)$

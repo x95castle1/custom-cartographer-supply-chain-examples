@@ -1,0 +1,92 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterConfigTemplate
+metadata:
+  name: config-deliverable-template
+spec:
+  configPath: .data
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:yaml", "yaml")
+
+    #@ def has_git_params():
+    #@   if 'gitops_repository_prefix' in data.values.params:
+    #@     return True
+    #@   end
+    #@
+    #@   if 'gitops_repository' in data.values.params:
+    #@     return True
+    #@   end
+    #@
+    #@   return False
+    #@ end
+
+    #@ def is_gitops():
+    #@   return has_git_params()
+    #@ end
+
+    #@ def param(key):
+    #@   if not key in data.values.params:
+    #@     return None
+    #@   end
+    #@   return data.values.params[key]
+    #@ end
+
+    #@ def strip_trailing_slash(some_string):
+    #@   if some_string[-1] == "/":
+    #@     return some_string[:-1]
+    #@   end
+    #@   return some_string
+    #@ end
+
+    #@ def git_repository():
+    #@   strip_trailing_slash(data.values.params.gitops_server_address)
+    #@   return "/".join([
+    #@     strip_trailing_slash(data.values.params.gitops_server_address),
+    #@     strip_trailing_slash(data.values.params.gitops_repository_owner),
+    #@     data.values.params.gitops_repository_name,
+    #@   ]) + ".git"
+    #@ end
+
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.deliverable.metadata, "labels"):
+    #@     labels.update(data.values.deliverable.metadata.labels)
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    #@ def deliverable():
+    apiVersion: carto.run/v1alpha1
+    kind: Deliverable
+    metadata:
+      name: #@ data.values.deliverable.metadata.name
+      namespace: #@ data.values.deliverable.metadata.namespace
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "deliverable", "app.tanzu.vmware.com/deliverable-type": "web" })
+    spec:
+      #@ if/end hasattr(data.values.deliverable.spec, "serviceAccountName"):
+      serviceAccountName: #@ data.values.deliverable.spec.serviceAccountName
+
+      params:
+        - name: "gitops_ssh_secret"
+          value: #@ param("gitops_ssh_secret")
+        - name: "gitops_sub_path"
+          value: #@ "config/" + data.values.deliverable.metadata.namespace + "/" + data.values.deliverable.metadata.name
+
+      source:
+        git:
+          url: #@ git_repository()
+          ref:
+            branch: #@ param("gitops_branch")
+    #@ end
+
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: #@ data.values.deliverable.metadata.name + "-deliverable"
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "config" })
+    data:
+      #@yaml/text-templated-strings
+      (@= data.values.deliverable.metadata.name @)-deliverable.yml: #@ yaml.encode(deliverable())
