@@ -43,7 +43,10 @@ spec:
   - name: prod-deliverable-config-writer-and-pr
     configs:
     - name: config
-      resource: prod-deliverable-config 
+      resource: prod-deliverable-config
+    sources:
+    - name: source
+      resource: source-provider
     params:
     - name: serviceAccount
       value: default

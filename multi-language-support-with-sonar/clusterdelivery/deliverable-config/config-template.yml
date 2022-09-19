@@ -77,7 +77,7 @@ spec:
         git:
           url: #@ git_repository()
           ref:
-            branch: #@ param("gitops_branch")
+            branch: main
     #@ end
 
     ---

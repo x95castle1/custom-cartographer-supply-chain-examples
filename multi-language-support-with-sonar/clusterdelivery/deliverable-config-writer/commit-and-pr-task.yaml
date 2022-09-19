@@ -68,7 +68,7 @@ spec:
       mountPath: /workspaces/ws
   steps:
     - name: git-clone-and-push
-      image: northamerica-northeast2-docker.pkg.dev/kontinue/catalog/config-writer
+      image: tapsme/config-writer
       securityContext:
         runAsUser: 0
       workingDir: /root
@@ -119,7 +119,7 @@ spec:
         echo "$commit_branch" > /workspaces/ws/commit_branch
 
     - name: ensure-base-branch-exists
-      image: northamerica-northeast2-docker.pkg.dev/kontinue/catalog/config-writer
+      image: tapsme/config-writer
       securityContext:
         runAsUser: 0
       workingDir: /root
@@ -155,7 +155,7 @@ spec:
         fi
 
     - name: open-pr
-      image: ghcr.io/jenkins-x/jx-scm
+      image: tapsme/jx-scm
       script: |
         #!/usr/bin/env bash
 
@@ -165,7 +165,7 @@ spec:
         head_branch=$(cat /workspaces/ws/commit_branch | tr -d '\n')
 
         token=$(cat $(credentials.path)/.git-credentials | sed -e 's/https:.*://' | sed -e 's/@.*//')
-
+        echo $token
         jx-scm pull-request create \
           --kind "$(params.git_server_kind)" \
           --server "$(params.git_server_address)" \

@@ -18,10 +18,16 @@ spec:
     name: gitops_user_email
   - default: supplychain@cluster.local
     name: gitops_commit_message
-  - default: ""
+  - default: "gitops-ssh"
     name: gitops_ssh_secret
+  - default: ssh://git@github.com
+    name: gitops_server_address
+  - default: Mpluya
+    name: gitops_repository_owner
+  - default: config-polaris-demo
+    name: gitops_repository_name
   - default: github
-    name: gitops_server_kind
+    name: gitops_pull_request_server_kind
   - default: ""
     name: gitops_commit_branch
   - default: ready for review
