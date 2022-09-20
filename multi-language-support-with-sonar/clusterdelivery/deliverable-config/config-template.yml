@@ -62,7 +62,9 @@ spec:
     metadata:
       name: #@ data.values.deliverable.metadata.name
       namespace: #@ data.values.deliverable.metadata.namespace
-      labels: #@ merge_labels({ "app.kubernetes.io/component": "deliverable", "app.tanzu.vmware.com/deliverable-type": "web" })
+      labels: 
+         app.kubernetes.io/component: deliverable
+         app.tanzu.vmware.com/deliverable-type: web
     spec:
       #@ if/end hasattr(data.values.deliverable.spec, "serviceAccountName"):
       serviceAccountName: #@ data.values.deliverable.spec.serviceAccountName
@@ -88,4 +90,4 @@ spec:
       labels: #@ merge_labels({ "app.kubernetes.io/component": "config" })
     data:
       #@yaml/text-templated-strings
-      (@= data.values.deliverable.metadata.name @)-deliverable.yml: #@ yaml.encode(deliverable())
+      (@= data.values.deliverable.metadata.name @)-(@= data.values.deliverable.metadata.namespace @)-deliverable.yml: #@ yaml.encode(deliverable())
