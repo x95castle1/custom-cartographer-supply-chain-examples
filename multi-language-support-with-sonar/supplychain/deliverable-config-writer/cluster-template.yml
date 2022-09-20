@@ -11,6 +11,44 @@ spec:
     #@ load("@ytt:data", "data")
     #@ load("@ytt:json", "json")
     #@ load("@ytt:base64", "base64")
+    #@ load("@ytt:assert", "assert")
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.workload.metadata, "labels"):
+    #@     labels.update(data.values.workload.metadata.labels)
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    #@ def is_monorepo_approach():
+    #@   if 'gitops_server_address' in data.values.params and 'gitops_repository_owner' in data.values.params and 'gitops_repository_name' in data.values.params:
+    #@     return True
+    #@   end
+    #@   if 'gitops_server_address' in data.values.params or 'gitops_repository_owner' in data.values.params or 'gitops_repository_name' in data.values.params:
+    #@     'gitops_server_address' in data.values.params or assert.fail("missing param: gitops_server_address")
+    #@     'gitops_repository_owner' in data.values.params or assert.fail("missing param: gitops_repository_owner")
+    #@     'gitops_repository_name' in data.values.params or assert.fail("missing param: gitops_repository_name")
+    #@   end
+    #@   return False
+    #@ end
+
+    #@ def has_git_params():
+    #@   if 'gitops_repository_prefix' in data.values.params:
+    #@     return True
+    #@   end
+    #@
+    #@   if 'gitops_repository' in data.values.params:
+    #@     return True
+    #@   end
+    #@
+    #@   return False
+    #@ end
+
+    #@ def is_gitops():
+    #@   return is_monorepo_approach() or has_git_params()
+    #@ end
 
     #@ def param(key):
     #@   if not key in data.values.params:
@@ -19,6 +57,34 @@ spec:
     #@   return data.values.params[key]
     #@ end
 
+    #@ def strip_trailing_slash(some_string):
+    #@   if some_string[-1] == "/":
+    #@     return some_string[:-1]
+    #@   end
+    #@   return some_string
+    #@ end
+
+    #@ def mono_repository():
+    #@   strip_trailing_slash(data.values.params.gitops_server_address)
+    #@   return "/".join([
+    #@     strip_trailing_slash(data.values.params.gitops_server_address),
+    #@     strip_trailing_slash(data.values.params.gitops_repository_owner),
+    #@     data.values.params.gitops_repository_name,
+    #@   ]) + ".git"
+    #@ end
+
+    #@ def git_repository():
+    #@   if is_monorepo_approach():
+    #@     return mono_repository()
+    #@   end
+    #@
+    #@   if 'gitops_repository' in data.values.params:
+    #@     return param("gitops_repository")
+    #@   end
+    #@
+    #@   prefix = param("gitops_repository_prefix")
+    #@   return prefix + data.values.workload.metadata.name + ".git"
+    #@ end
     ---
     apiVersion: carto.run/v1alpha1
     kind: Runnable
@@ -53,3 +119,6 @@ spec:
             value: #@ param("gitops_commit_message")
           - name: git_files
             value: #@ base64.encode(json.encode(data.values.config))
+          #@ if/end is_monorepo_approach():
+          - name: sub_path
+            value: #@ "config/" + data.values.workload.metadata.namespace + "/" + data.values.workload.metadata.name

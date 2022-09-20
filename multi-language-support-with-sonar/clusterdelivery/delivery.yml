@@ -36,6 +36,9 @@ spec:
 
   - configs:
     name: prod-deliverable-config
+    sources:
+    - name: source
+      resource: source-provider
     templateRef:
       kind: ClusterConfigTemplate
       name: config-deliverable-template

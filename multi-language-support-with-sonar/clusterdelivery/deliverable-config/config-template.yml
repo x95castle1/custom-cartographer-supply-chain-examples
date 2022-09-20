@@ -38,31 +38,16 @@ spec:
     #@   return some_string
     #@ end
 
-    #@ def git_repository():
-    #@   return "/".join([
-    #@     "https://github.com",
-    #@     strip_trailing_slash(data.values.params.deliverable_repository_owner),
-    #@     data.values.params.deliverable_repository_name,
-    #@   ]) + ".git"
-    #@ end
-
-
-    #@ def merge_labels(fixed_values):
-    #@   labels = {}
-    #@   if hasattr(data.values.deliverable.metadata, "labels"):
-    #@     labels.update(data.values.deliverable.metadata.labels)
-    #@   end
-    #@   labels.update(fixed_values)
-    #@   return labels
-    #@ end
-
     #@ def deliverable():
     apiVersion: carto.run/v1alpha1
     kind: Deliverable
     metadata:
       name: #@ data.values.deliverable.metadata.name
       namespace: #@ data.values.deliverable.metadata.namespace
-      labels: #@ merge_labels({ "app.kubernetes.io/component": "deliverable", "app.tanzu.vmware.com/deliverable-type": "web" })
+      labels: 
+         app.kubernetes.io/component: deliverable
+         app.tanzu.vmware.com/deliverable-type: web
+         app.tanzu.vmware.com/delivery-commit-sha: #@ data.values.source.revision
     spec:
       #@ if/end hasattr(data.values.deliverable.spec, "serviceAccountName"):
       serviceAccountName: #@ data.values.deliverable.spec.serviceAccountName
@@ -75,7 +60,7 @@ spec:
 
       source:
         git:
-          url: #@ git_repository()
+          url: #@ data.values.deliverable.spec.source.git.url
           ref:
             branch: main
     #@ end
@@ -85,7 +70,8 @@ spec:
     kind: ConfigMap
     metadata:
       name: #@ data.values.deliverable.metadata.name + "-deliverable"
-      labels: #@ merge_labels({ "app.kubernetes.io/component": "config" })
+      labels:
+        app.kubernetes.io/component: config
     data:
       #@yaml/text-templated-strings
-      (@= data.values.deliverable.metadata.name @)-deliverable.yml: #@ yaml.encode(deliverable())
+      (@= data.values.deliverable.metadata.name @)-(@= data.values.deliverable.metadata.namespace @)-deliverable.yml: #@ yaml.encode(deliverable())
