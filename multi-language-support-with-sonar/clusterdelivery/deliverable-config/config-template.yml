@@ -24,6 +24,7 @@ spec:
     #@   return has_git_params()
     #@ end
 
+
     #@ def param(key):
     #@   if not key in data.values.params:
     #@     return None
@@ -47,7 +48,7 @@ spec:
       labels: 
          app.kubernetes.io/component: deliverable
          app.tanzu.vmware.com/deliverable-type: web
-         app.tanzu.vmware.com/delivery-commit-sha: #@ data.values.source.revision
+         app.tanzu.vmware.com/delivery-commit-sha: #@ data.values.source.revision.replace("/", "_")
     spec:
       #@ if/end hasattr(data.values.deliverable.spec, "serviceAccountName"):
       serviceAccountName: #@ data.values.deliverable.spec.serviceAccountName

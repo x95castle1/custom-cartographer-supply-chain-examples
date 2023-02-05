@@ -29,8 +29,4 @@ spec:
           emptyDir: {}
       pipelineRef:
         name: $(selected.metadata.name)$
-      params:
-      - name: source-url
-        value: $(runnable.spec.inputs.source-url)$
-      - name: source-revision
-        value: $(runnable.spec.inputs.source-revision)$
+      params: $(runnable.spec.inputs.tekton-params)$
